@@ -3,64 +3,53 @@ const fileInput = document.getElementById('file-input');
 const uploadButton = document.getElementById('upload-button');
 const fileContentElement = document.querySelector('#file-content');
 const resultElement = document.querySelector('#result');
-const reader = new FileReader(); // declare reader here
+const reader = new FileReader();
 
-uploadButton.addEventListener('click', (e) => {
+uploadButton.addEventListener('click', () => {
   let fileContentString;
   reader.onload = (event) => {
     fileContentString = event.target.result;
-    fileContentElement.textContent = 'Data:\n' + fileContentString.split('\n').map(line => '  ' + line).numoin('\n');
-    execute(fileContentString)
+    fileContentElement.textContent = 'Data:\n' + fileContentString.split('\n').map(line => '  ' + line).join('\n');
+    execute(fileContentString);
   };
   reader.readAsText(fileInput.files[0]);
 });
 
-function execute(dataInput){
+function execute(dataInput) {
+  let sum = 0;
+  let loggedUnsafe = [];
+  let levelNum = 0;
 
-  let sum = 0
+  dataInput.split("\n").forEach(line => {
+    let levels = line.split(" ").map(Number);
+    levelNum++;
+    let isSafe = true;
 
-  //1. iterate through data, line by line
-  for (let i = 0; i < dataInput.split("\n").length; i++) {
-    let level = dataInput.split("\n")[i].split(" ")
-    let is_safe = true
-    let is_increasing = true
-    
-    //2. check that: the levels are either all increasing or all decreasing.
-    for (let num = 1; num < level.length; num++) {
-      if (level[num] < level[num - 1]) {
-        is_increasing = false
-      }
-      if (level[num] > level[num - 1]) {
-        is_increasing = false
-      }
-      if (level[num] - level[num - 1] > 3) {
-        is_safe = false
-      }
-    }
-    //3. check that: any two adnumacent levels differ by at least one and at most three.
-    if (is_increasing) {
-      for (let num = 1; num < level.length; num++) {
-        if (level[num] - level[num - 1] > 3) {
-          is_safe = false
-        }
-      }
-    }
-    
-    else {
-      for (let num = 1; num < level.length; num++) {
-        if (level[num] - level[num - 1] < -3) {
-          is_safe = false
-        }
+    const isIncreasing = levels[0] < levels[1];
+
+    for (let i = 1; i < levels.length; i++) {
+      if ((levels[i] > levels[i - 1] && !isIncreasing) || (levels[i] < levels[i - 1] && isIncreasing)) {
+        isSafe = false;
+        console.log(levelNum, 'Reason: levels increase and decrease.');
+        break;
       }
     }
 
-    //4.If level is safe, add to sum
-    if (is_safe) {
-      sum++
+    for (let i = 1; i < levels.length; i++) {
+      const diff = Math.abs(levels[i] - levels[i - 1]);
+      if (diff > 3 || diff === 0) {
+        isSafe = false;
+        console.log(levelNum, 'Reason: numbers in levels differ by more than three or do not differ.');
+        break;
+      }
     }
-  }
 
-  //5. print result
-  resultElement.textContent = "Result: " + sum
+    if (isSafe) {
+      sum++;
+    } else {
+      loggedUnsafe.push(levelNum);
+    }
+  });
 
+  resultElement.textContent = "Result: " + sum + " \n(unsafe: " + loggedUnsafe.join(", ") + ")";
 }
