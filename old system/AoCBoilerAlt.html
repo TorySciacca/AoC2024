@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tory's Homebrew Advent of Code Boilerplate</title>
+</head>
+<body>
+  <select id="script-file-input">
+    <option value="">Select a day</option>
+    <option value="1.js">Day 1</option>
+    <option value="2.js">Day 2</option>
+    <option value="3.js">Day 3</option>
+    <option value="4.js">Day 4</option>
+    <option value="5.js">Day 5</option>
+    <option value="6.js">Day 6</option>
+    <option value="7.js">Day 7</option>
+    <option value="8.js">Day 8</option>
+    <option value="9.js">Day 9</option>
+  </select>
+  <input type="file" id="file-input">
+  <button id="upload-button">Analyse</button>
+  <p id="result"></p>
+  <p id="file-content"></p>
+
+  <script>
+    document.getElementById('script-file-input').addEventListener('change', function(){
+      var day = this.value;
+      var reader = new FileReader();
+      reader.onload = function(event){
+        var scriptTag = document.createElement("script");
+        scriptTag.textContent = event.target.result;
+        document.head.appendChild(scriptTag);
+      };
+      reader.readAsText(document.getElementById('script-file-input').files[0]);
+    });
+  </script>
+
+</body>
+</html>
+
