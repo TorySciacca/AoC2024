@@ -1,6 +1,5 @@
-//AoC Master JS File:p
+//AoC Master JS File
 
-// external.js
 const fileInput = document.getElementById('file-input');
 const uploadButton = document.getElementById('upload-button');
 const fileContentElement = document.querySelector('#file-content');
@@ -212,12 +211,10 @@ function day3(dataInput){
                     if ((numA.length <= 3) && !dividerFound) {
                         if (c === ',' && numA.length > 0){dividerFound = true} 
                         else if (!isNaN(c)){numA += c} 
-                        else {errorFound = true}
 
                     } else if ((numB.length < 3) && dividerFound && !suffixFound) { 
                         if (c === ')' && numB.length > 0){suffixFound = true} 
                         else if (!isNaN(c)){numB += c} 
-                        else {errorFound = true}
                     } else {break} // end of numA and numB, stop searching
                 }
                 const COMPLETE_FUNCTION_LENGTH = numA.length+numB.length + 'mul(,)'.length - 1
@@ -233,12 +230,82 @@ function day3(dataInput){
     resultElement.textContent = "Result: " + sum;
 }
 
-function day4(){resultElement.textContent = "Incompleted day"}
-function day5(){resultElement.textContent = "Incompleted day"}
-function day6(){resultElement.textContent = "Incompleted day"}
-function day7(){resultElement.textContent = "Incompleted day"}
-function day8(){resultElement.textContent = "Incompleted day"}
-function day9(){resultElement.textContent = "Incompleted day"}
+function day4(dataInput){
+
+  let sum = 0;
+  // Map puzzle input into 2D array
+  const mappedData = dataInput.split("\n").map(row => row.split(""));
+  console.log(mappedData)
+  //given js treats strings like arrays, this already maps into a 2D array
+
+
+  // Search for acceptable input (XMAS in any direction)
+  for (let x = 0; x < mappedData.length; x += 1) {
+    for (let y = 0; y < mappedData[x].length; y += 1) {
+      if (mappedData[x][y] == 'X'){
+        const directions = [
+          [1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]
+        ];
+
+        directions.forEach(([dx, dy]) => {
+          let found = true;
+          const word = 'XMAS'; 
+
+          for (let k = 1; k < word.length; k++) {
+            const nx = x + k * dx;
+            const ny = y + k * dy;
+            if (!mappedData[nx] || mappedData[nx][ny] !== word[k]) {
+              found = false;
+              break;
+            }
+          }
+          if (found) {
+            sum += 1;
+          }
+        });
+      }
+    }
+  }
+
+  resultElement.textContent = "Result: " + sum;
+}
+
+function day5(dataInput){
+  console.log(dataInput.split("\n"))
+  let sum = 0;
+  //seperate rules section from input section - split on empty line
+  let unorganisedData = dataInput.split("\n")
+
+  let rules = []
+  let update = []
+  
+
+  for (let i = 0; i < unorganisedData.length; i += 1) {
+    if (unorganisedData[i] === '') {
+      rules = unorganisedData.slice(0, i)
+      update = unorganisedData.slice(i + 1)
+    }
+  }
+
+  console.log(rules);
+  console.log(update);
+  
+  //define rules
+
+
+  //see if input matches rules
+
+
+  //if it does, find the middle number within set and add to sum
+
+  resultElement.textContent = "Result: " + sum;
+
+}
+
+function day6(){resultElement.textContent  = "Incompleted day"}
+function day7(){resultElement.textContent  = "Incompleted day"}
+function day8(){resultElement.textContent  = "Incompleted day"}
+function day9(){resultElement.textContent  = "Incompleted day"}
 function day10(){resultElement.textContent = "Incompleted day"}
 function day11(){resultElement.textContent = "Incompleted day"}
 function day12(){resultElement.textContent = "Incompleted day"}
