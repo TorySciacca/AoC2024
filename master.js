@@ -13,11 +13,20 @@ uploadButton.addEventListener('click', (e) => {
     fileContentString = event.target.result;
     fileContentElement.textContent = 'Data: ' + fileContentString;
     const day = parseInt(document.getElementById('day-select').value, 10);
-    execute(fileContentString, day);
+    if (checkFileName(fileInput.files[0], day)) {execute(fileContentString, day);}
     console.log('Running script for day ' + day)
   };
   reader.readAsText(fileInput.files[0]);
 });
+
+function checkFileName(file, day) {
+  const fileName = file.name;
+  if(fileName !== `${day}a.txt` && fileName !== `${day}b.txt`) {
+    resultElement.textContent = `Error: File must be for day ${day} (a = test, b = actual)`;
+    return false;
+  }
+  return true;
+}
 
 function execute(dataInput, day) {
   switch(day) {
@@ -181,42 +190,67 @@ function day3(dataInput){
 
     for (let i = 0; i < dataInput.length; i += 1) {
         let char = dataInput[i];
-
-        let uncorruptedFunction = ''
-        let uncorruptedFunctionPrefix = 'mul('
-        let uncorruptedFunctionSuffix = ')'
-        let is_function_corrupted = true
-        // each function must be at least 1-3 digit numbers so minimum of 6 spaces needed for numbers.
+        const uncorruptedFunctionPrefix = 'mul(' // function must follow mul(x,y)
+        const uncorruptedFunctionSuffix = ')'
+        const MAX_NUM_SPACES = 12 // mul(XXX,YYY) // each function must be at least 1-3 digit numbers so max chars is 12
         
-        if (char === uncorruptedFunctionPrefix[0]) {
-            if (dataInput.slice(i, i + uncorruptedFunctionPrefix.length) === uncorruptedFunctionPrefix) {
-                //console.log(dataInput.slice(i, i + 9))
+        if (char === uncorruptedFunctionPrefix[0]) { // start of function found
 
-                let errorFound = false
+            if (dataInput.slice(i, i + uncorruptedFunctionPrefix.length) === uncorruptedFunctionPrefix) {
+                console.log(dataInput.slice(i, i + MAX_NUM_SPACES))
+                
                 let numA = ''
                 let numB = ''
                 let dividerFound = false // divider is noted as ','
+                let errorFound = false // functions could start correct but have incorrect numbers/symbols
 
-                for (let j = 0; j < 8; j += 1) {
+                let suffixFound = false //suffix is noted as ')'
+
+                for (let j = 0; j < MAX_NUM_SPACES; j += 1) { //find numA and numB
                     const c = dataInput[i + j]
-                    if ((numA.length < 3) && !dividerFound) {
-                        if (c === ','){dividerFound = true} else if (!isNaN(c)){numA += c} else {errorFound = true}
-                    } else if ((numB.length < 3) && dividerFound) {
-                        if (c === ')'){dividerFound = true} else if (!isNaN(c)){numB += c} else {errorFound = true}
-                    }
-                    }
+                    
+                    if ((numA.length <= 3) && !dividerFound) {
+                        if (c === ',' && numA.length > 0){dividerFound = true} 
+                        else if (!isNaN(c)){numA += c} 
+                        else {errorFound = true}
+
+                    } else if ((numB.length < 3) && dividerFound && !suffixFound) { 
+                        if (c === ')' && numB.length > 0){suffixFound = true} 
+                        else if (!isNaN(c)){numB += c} 
+                        else {errorFound = true}
+                    } else {break} // end of numA and numB, stop searching
+                }
+                const COMPLETE_FUNCTION_LENGTH = numA.length+numB.length + 'mul(,)'.length - 1
                 
-                if (errorFound && numA !== '' && numB !== '' && dataInput[i+uncorruptedFunctionPrefix.length+numA.length+numB.length+1] === uncorruptedFunctionSuffix[0]) {
+                if (numA !== '' && numB !== '' && dataInput[i + COMPLETE_FUNCTION_LENGTH] === uncorruptedFunctionSuffix) {
                     sum += (parseInt(numA) * parseInt(numB));
                     amountValid++;
-                }
-
-                console.log(amountValid, numA, numB, numA*numB)
-                //console.log(dataInput.slice(i, uncorruptedFunctionPrefix.length+ numA.length + numB.length + 2))
-                
-                }
+                } 
+                //console.log(amountValid, numA, numB) 
             }
-
+        }
     }
     resultElement.textContent = "Result: " + sum;
 }
+
+function day4(){resultElement.textContent = "Incompleted day"}
+function day5(){resultElement.textContent = "Incompleted day"}
+function day6(){resultElement.textContent = "Incompleted day"}
+function day7(){resultElement.textContent = "Incompleted day"}
+function day8(){resultElement.textContent = "Incompleted day"}
+function day9(){resultElement.textContent = "Incompleted day"}
+function day10(){resultElement.textContent = "Incompleted day"}
+function day11(){resultElement.textContent = "Incompleted day"}
+function day12(){resultElement.textContent = "Incompleted day"}
+function day13(){resultElement.textContent = "Incompleted day"}
+function day14(){resultElement.textContent = "Incompleted day"}
+function day15(){resultElement.textContent = "Incompleted day"}
+function day16(){resultElement.textContent = "Incompleted day"}
+function day17(){resultElement.textContent = "Incompleted day"}
+function day18(){resultElement.textContent = "Incompleted day"}
+function day19(){resultElement.textContent = "Incompleted day"}
+function day20(){resultElement.textContent = "Incompleted day"}
+function day21(){resultElement.textContent = "Incompleted day"}
+function day22(){resultElement.textContent = "Incompleted day"}
+function day23(){resultElement.textContent = "Incompleted day"}
+function day24(){resultElement.textContent = "Incompleted day"}
