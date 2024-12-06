@@ -13,7 +13,7 @@ uploadButton.addEventListener('click', (e) => {
     fileContentElement.textContent = 'Data: ' + fileContentString;
     const day = parseInt(document.getElementById('day-select').value, 10);
     if (checkFileName(fileInput.files[0], day)) {execute(fileContentString, day);}
-    console.log('Running script for day ' + day)
+    console.log('Script Complete for Day ' + day)
   };
   reader.readAsText(fileInput.files[0]);
 });
@@ -327,10 +327,84 @@ function day5(dataInput){
 }
 
 function day6(dataInput){
+  let sum = 0;
 
-  resultElement.textContent  = "Hol up.. we dem boys"
+  // Map puzzle input into 2D array
+  const mappedData = dataInput.split("\n").map(row => row.split(""));
+  console.log(mappedData)
 
+  // Find guard starting position 
+  let guardPosition = []
+
+  for (let x = 0; x < mappedData.length; x += 1) {
+    if (!mappedData[x]) {
+      console.log('Error: Mapped data at index', x, 'is null');
+      throw new Error('Mapped data at index ' + x + ' is null');
+    }
+    for (let y = 0; y < mappedData[x].length; y += 1) {
+      if (!mappedData[x][y]) {
+        console.log('Error: Mapped data at index', x, ',', y, 'is null');
+        throw new Error('Mapped data at index ' + x + ', ' + y + ' is null');
+      }
+      if (mappedData[x][y] == '^'){
+        guardPosition = [x, y]
+        console.log('Guard found at position:',guardPosition)   
+        break
+      }
+    }
+  }
+
+  if (!guardPosition.length) {
+    throw new Error('Guard not found in mapped data');
+  }
+
+  // Follow guard until they leave the map
+  // Count how many distinct positions will the guard visit before leaving the mapped area
+
+  const directions = {'N': [-1, 0], 'S': [1, 0], 'E': [0, 1], 'W': [0, -1]};
+  let guardFacing = directions['N'] //Always starts facing north
+
+  // RULES:
+    // guard moves one step at a time, forward until there is an object infront
+    // then they will turn 90 degrees clockwise untill the path is clear
+
+  let visitedPositions = [guardPosition]
+
+  while (true) {
+    // Move guard forward
+    console.log('Guard moving forward, facing', Object.keys(directions).find(key => directions[key][0] === guardFacing[0] && directions[key][1] === guardFacing[1]))
+    let nextPosition = [guardPosition[0] + guardFacing[0], guardPosition[1] + guardFacing[1]];
+    
+    if (!mappedData[nextPosition[0]] || mappedData[nextPosition[0]][nextPosition[1]] == '#') {
+        console.log('Guard found wall at position:', nextPosition);
+
+        // Turn 90 degrees clockwise until clear path is found
+        if (guardFacing == directions['N']) {
+            guardFacing = directions['E'];
+        } else if (guardFacing == directions['E']) {
+            guardFacing = directions['S'];
+        } else if (guardFacing == directions['S']) {
+            guardFacing = directions['W'];
+        } else if (guardFacing == directions['W']) {
+            guardFacing = directions['N'];
+        }
+        console.log('Guard turned to face:', guardFacing);
+
+    } else if (mappedData[nextPosition[0]][nextPosition[1]] == '.' || mappedData[nextPosition[0]][nextPosition[1]] == '^') {
+        guardPosition = nextPosition;
+        console.log('Guard moved to position:', guardPosition);
+        visitedPositions.push(guardPosition);
+        sum++;
+    } else{ break }
+  }
+  // clear visited positions of duplicates
+  console.log(visitedPositions.length)
+  const uniqueArr = Array.from(new Set(visitedPositions.map(JSON.stringify)), JSON.parse);
+
+  sum = uniqueArr.length
+  resultElement.textContent  = "Result: " + sum
 }
+
 function day7(){resultElement.textContent  = "Incompleted day"}
 function day8(){resultElement.textContent  = "Incompleted day"}
 function day9(){resultElement.textContent  = "Incompleted day"}
