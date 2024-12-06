@@ -271,38 +271,66 @@ function day4(dataInput){
 }
 
 function day5(dataInput){
-  console.log(dataInput.split("\n"))
   let sum = 0;
+
   //seperate rules section from input section - split on empty line
   let unorganisedData = dataInput.split("\n")
 
   let rules = []
-  let update = []
-  
+  let updates = []
 
   for (let i = 0; i < unorganisedData.length; i += 1) {
     if (unorganisedData[i] === '') {
       rules = unorganisedData.slice(0, i)
-      update = unorganisedData.slice(i + 1)
+      updates = unorganisedData.slice(i + 1)
     }
   }
+  //Loop through each update to check if update matches rules
+  for (let i = 0; i < updates.length; i += 1) { 
+    const UPDATE = updates[i].split(',')
+    let valid = true //if update breaks a rule, valid = false and not added to sum
 
-  console.log(rules);
-  console.log(update);
-  
-  //define rules
+    //Loop through each number in update
+    for (let j = 0; j < UPDATE.length; j += 1) { 
+      //console.log(UPDATE[j])
 
+      //Loop through each rule according to number
+      for (let k = 0; k < rules.length; k += 1) { //loop through rules for preceding number
 
-  //see if input matches rules
-
-
-  //if it does, find the middle number within set and add to sum
-
+        const RULE = rules[k].split('|')
+        const PRECEDING_NUM = RULE[0] //This number MUST be before successing number
+        const SUCCEEDING_NUM = RULE[1]
+        
+        if (UPDATE[j] === PRECEDING_NUM ){ 
+          
+          //loop through update again backwards and check that succeeding number is after preceding within update
+          for (let l = UPDATE.length - 1; l >= 0; l -= 1) {
+            if (UPDATE[l] === SUCCEEDING_NUM) { // if succeeding number is found, check if preceding number is before succeeding number
+              if (l < j) {
+                console.log("Invalid line: ", i);
+                console.log("Reason: ", PRECEDING_NUM, "is before", SUCCEEDING_NUM);
+                valid = false;
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    if (valid) { //add middle number within update line to sum (rounding up)
+      sum += Math.ceil(UPDATE[Math.floor(UPDATE.length / 2)]);
+      console.log("Valid line: ",i)
+    }
+  }
   resultElement.textContent = "Result: " + sum;
-
 }
 
-function day6(){resultElement.textContent  = "Incompleted day"}
+function day6(dataInput){
+
+  resultElement.textContent  = "Hol up.. we dem boys"
+
+}
 function day7(){resultElement.textContent  = "Incompleted day"}
 function day8(){resultElement.textContent  = "Incompleted day"}
 function day9(){resultElement.textContent  = "Incompleted day"}
