@@ -405,7 +405,70 @@ function day6(dataInput){
   resultElement.textContent  = "Result: " + sum
 }
 
-function day7(){resultElement.textContent  = "Incompleted day"}
+function day7(dataInput){
+  let sum = 0
+
+  // Separate input into line of operations
+  let operations = dataInput.split("\n")
+
+  for (let i = 0; i < operations.length; i+= 1){
+
+    // Separate operations into sum and equation
+    let operationTotal = operations[i].split(": ")[0]
+    let equation = operations[i].split(": ")[1].split(' ')
+
+    // Try all possible combinations of + and * (from left to right) to see if equation matches sum
+    const tryOperations = (equation, operationTotal) => { 
+      // Recursively generates all possible combinations of + and *
+      // in the equation and checks if the result of the equation matches the operation total
+
+      // It does this by splicing in a + or * at each index of the equation and then recursively 
+      // calling itself with the new equation. If the result of the equation matches the total it returns true
+      // otherwise it returns false and backtracks to try a different combination
+
+      // If no combinations are found it returns false, which is valid in this case
+      const evaluate = (expr) => {
+        let result = parseInt(expr[0]);
+        for (let i = 1; i < expr.length; i += 2) {
+          const operator = expr[i];
+          const nextNumber = parseInt(expr[i + 1]);
+          if (operator === '+') {
+            result += nextNumber;
+          } else if (operator === '*') {
+            result *= nextNumber;
+          }
+        }
+        return result;
+      };
+
+      const generateCombinations = (expr, index = 1) => { 
+        if (index >= expr.length) {
+          return evaluate(expr) === parseInt(operationTotal);
+        }
+
+        // Try addition
+        expr.splice(index, 0, '+');
+        if (generateCombinations(expr, index + 2)) return true;
+        expr.splice(index, 1);
+
+        // Try multiplication
+        expr.splice(index, 0, '*');
+        if (generateCombinations(expr, index + 2)) return true;
+        expr.splice(index, 1);
+
+        return false;
+      };
+
+      return generateCombinations([...equation]);
+    }
+
+    if (tryOperations(equation, operationTotal)) {
+      sum += parseInt(operationTotal)
+    }
+  }
+  resultElement.textContent  = "Result: " + sum
+}
+
 function day8(){resultElement.textContent  = "Incompleted day"}
 function day9(){resultElement.textContent  = "Incompleted day"}
 function day10(){resultElement.textContent = "Incompleted day"}
