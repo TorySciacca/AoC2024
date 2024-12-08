@@ -291,6 +291,13 @@ function day3(dataInput){
     resultElement.textContent = "Result: " + sum;
 }
 
+  /**
+   * Day 4 of the Advent of Code challenge
+   * 
+   * Takes a 2D array of strings and returns the count of 'XMAS' in any direction.
+   * @param {string} dataInput - string of 2D array separated by newlines
+   * @returns {number} - count of 'XMAS' in any direction
+   */
 function day4(dataInput){
 
   let sum = 0;
@@ -331,6 +338,24 @@ function day4(dataInput){
   resultElement.textContent = "Result: " + sum;
 }
 
+  /**
+   * Day 5 of the Advent of Code challenge
+   * 
+   * Takes a string of newline separated lines and
+   * returns the sum of the middle number of each valid line
+   * 
+   * A line is valid if it does not break any of the rules
+   * 
+   * The rules are given as a string of newline separated lines
+   * Each line of the rules contains a preceding number and a succeeding number
+   * separated by a '|' character
+   * 
+   * The rules are applied by looping through each number in the update line
+   * and checking if the number breaks any of the rules
+   * If a number breaks a rule, the line is not added to the sum
+   * 
+   * @param {string} dataInput - The string of newline separated lines
+   */
 function day5(dataInput){
   let sum = 0;
 
@@ -387,6 +412,20 @@ function day5(dataInput){
   resultElement.textContent = "Result: " + sum;
 }
 
+/**
+ * Day 6 of the Advent of Code challenge
+ *
+ * This function processes a given puzzle input to simulate the movement of a guard
+ * on a grid map. The guard starts facing north and will navigate the map based on
+ * set rules until they exit the map. It calculates the number of distinct positions
+ * visited by the guard before leaving the mapped area.
+ *
+ * @param {string} dataInput - A string representing the grid map, with each row
+ * separated by a newline. The guard's starting position is marked by '^', and
+ * obstacles are marked by '#'.
+ * @throws {Error} If the guard's starting position is not found or if any mapped
+ * data is null.
+ */
 function day6(dataInput){
   let sum = 0;
 
@@ -466,6 +505,15 @@ function day6(dataInput){
   resultElement.textContent  = "Result: " + sum
 }
 
+/**
+ * Day 7 of the Advent of Code challenge
+ * 
+ * Takes a string of newline separated lines, each line in the format "sum: equation"
+ * and returns the sum of all sums that can be reached by trying all possible combinations
+ * of + and * in the equation
+ * 
+ * @param {string} dataInput - string of newline separated lines
+ */
 function day7(dataInput){
   let sum = 0
 
@@ -530,7 +578,77 @@ function day7(dataInput){
   resultElement.textContent  = "Result: " + sum
 }
 
-function day8(){resultElement.textContent  = "Incompleted day"}
+  /**
+   * Day 8 of the Advent of Code challenge
+   * 
+   * Finds all antennas (single lowercase letter, uppercase letter or digit) in a given 2D grid
+   * and calculates the number of antinodes in the grid. An antinode is a point in the grid that
+   * is directly between two antennas, but only if one of the two antennas is twice as far away
+   * as the other. The antinode is only counted if it is inside the grid.
+   * 
+   * @param {string} dataInput - a string of newline separated lines representing the 2D grid
+   * @returns {number} - the number of antinodes in the grid
+   */
+function day8(dataInput){
+  let sum = 0;
+
+  // Map puzzle input into 2D array
+  const mappedData = dataInput.split("\n").map(row => row.split(""));
+  console.log(mappedData)
+
+  //Find all unque anntennas and note their position (a single lower case letter, uppercase letter or digit)
+  let foundAntennas = {};
+  for (let x = 0; x < mappedData.length; x += 1) {
+    for (let y = 0; y < mappedData[x].length; y += 1) {
+      if (mappedData[x][y] != '.') {
+        //add pos and char to dict
+        if (!(mappedData[x][y] in foundAntennas)) {
+          foundAntennas[mappedData[x][y]] = [[x, y]];
+        } else {
+          foundAntennas[mappedData[x][y]].push([x, y]);
+        }
+      } 
+  }}
+  console.log(foundAntennas)
+
+  //Loop through dict and compare antennas to determine antinodes
+
+  //Antinodes are occur in a stright plotted line with matching anntenna but only when one of the antennas is twice as far away as the other
+  //Cound pos towards sum if on map (if pos is outside map do NOT add to sum)
+  //Only need to know unique locations so double up is fine (see day 6)
+  let antinodes = []
+
+  for (let i = 0; i < Object.keys(foundAntennas).length; i += 1) { 
+    for (let j = 0; j < foundAntennas[Object.keys(foundAntennas)[i]].length; j += 1) {
+      for (let k = 0; k < foundAntennas[Object.keys(foundAntennas)[i]].length; k += 1) {
+        if (j != k) {
+          let pos1 = foundAntennas[Object.keys(foundAntennas)[i]][j]
+          let pos2 = foundAntennas[Object.keys(foundAntennas)[i]][k]
+          let distanceBetweenAntennas = [(pos1[0] - pos2[0]), pos1[1] - pos2[1]]
+
+          pos1 = [pos1[0] + distanceBetweenAntennas[0], pos1[1] + distanceBetweenAntennas[1]]
+          pos2 = [pos2[0] - distanceBetweenAntennas[0], pos2[1] - distanceBetweenAntennas[1]]
+
+          //check if antinode 1 and 2 are inside map
+          if (pos1[0] >= 0 && pos1[0] < mappedData.length && pos1[1] >= 0 && pos1[1] < mappedData[pos1[0]].length) {
+            antinodes.push(pos1) 
+            console.log('Found antinode: ',pos1)
+          }
+          if (pos2[0] >= 0 && pos2[0] < mappedData.length && pos2[1] >= 0 && pos2[1] < mappedData[pos2[0]].length){
+            antinodes.push(pos2) 
+            console.log('Found antinode: ',pos2)}
+        }
+      }
+    }
+  }
+
+  //Make antinodes positions un
+  const uniqueArr = Array.from(new Set(antinodes.map(JSON.stringify)), JSON.parse);
+
+  sum = uniqueArr.length
+  resultElement.textContent  = "Result: " + sum
+}
+
 function day9(){resultElement.textContent  = "Incompleted day"}
 function day10(){resultElement.textContent = "Incompleted day"}
 function day11(){resultElement.textContent = "Incompleted day"}
