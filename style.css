@@ -43,14 +43,14 @@ body {
 button,select{
     border: var(--quaternary-color) 1vh solid;
     font-size: 1em;
-    border-radius: 4vh;
+    border-radius: 5vh;
     background-color: var(--primary-color);
     font-family: 'DRSEUSS';
     color: var(--quaternary-color);
     text-align: center;
 }
 
-#file-input-container{
+#file-input-container {
     color: var(--primary-color);
     text-shadow: 0.2vh 0.2vh 0 white;
     width: 450px;
@@ -63,6 +63,7 @@ button,select{
     background-color: var(--tertiary-color);
     border-radius: 1vh;
     margin: 0 auto;
+    position: relative;
 }
 
 #result{
