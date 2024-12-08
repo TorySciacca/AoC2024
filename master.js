@@ -4,6 +4,7 @@ const fileInput = document.getElementById('file-input');
 const uploadButton = document.getElementById('upload-button');
 const fileContentElement = document.querySelector('#file-content');
 const resultElement = document.querySelector('#result');
+const logElement = document.querySelector('#log');
 const reader = new FileReader(); // declare reader here
 
 uploadButton.addEventListener('click', (e) => {
@@ -18,6 +19,34 @@ uploadButton.addEventListener('click', (e) => {
   reader.readAsText(fileInput.files[0]);
 });
 
+const fileNameDisplay = document.getElementById('file-name-display');
+
+window.addEventListener('load', () => {
+  const selectedFile = fileInput.files[0];
+  if (selectedFile) {
+    fileNameDisplay.textContent = 'File: ' + selectedFile.name;
+  } else {
+    fileNameDisplay.textContent = 'No file selected';
+  }
+});
+
+fileInput.addEventListener('change', (e) => {
+  const selectedFile = fileInput.files[0];
+  if (selectedFile) {
+    fileNameDisplay.textContent = 'File: ' + selectedFile.name;
+  } else {
+    fileNameDisplay.textContent = 'No file selected';
+  }
+});
+
+/**
+ * Checks that the uploaded file is named according to the following convention:
+ * Day X (Test) -> Xa.txt
+ * Day X (Actual) -> Xb.txt
+ * @param {File} file - The uploaded file object
+ * @param {number} day - The day of the Advent of Code challenge, should be an integer between 1 and 25
+ * @returns {boolean} - True if the file name is valid, false if not
+ */
 function checkFileName(file, day) {
   const fileName = file.name;
   if(fileName !== `${day}a.txt` && fileName !== `${day}b.txt`) {
@@ -27,6 +56,12 @@ function checkFileName(file, day) {
   return true;
 }
 
+/**
+ * Runs the solution for a given day.
+ * @param {string} dataInput The input data for the day
+ * @param {number} day The day to run the solution for
+ * @throws {Error} If the day is invalid
+ */
 function execute(dataInput, day) {
   switch(day) {
     case 1:
@@ -106,6 +141,14 @@ function execute(dataInput, day) {
   }
 }
 
+/**
+ * Day 1 of the Advent of Code challenge
+ *
+ * Takes a string of newline separated pairs of numbers and
+ * returns the sum of the absolute differences between the two numbers in each pair
+ *
+ * @param {string} dataInput - The string of newline separated pairs of numbers
+ */
 function day1(dataInput){
     //1. Load data into arrays
 
@@ -144,6 +187,17 @@ function day1(dataInput){
     resultElement.textContent = "Result: " + sum
 }
 
+  /**
+   * Day 2 of the Advent of Code challenge
+   *
+   * Takes a string of newline separated levels and
+   * returns the number of levels that are safe
+   *
+   * A level is safe if it is either strictly increasing or strictly decreasing
+   * and the difference between consecutive numbers is at most 3
+   *
+   * @param {string} dataInput - The string of newline separated levels
+   */
 function day2(dataInput){
     let sum = 0;
   let loggedUnsafe = [];
@@ -183,6 +237,13 @@ function day2(dataInput){
   resultElement.textContent = "Result: " + sum + " \n(unsafe: " + loggedUnsafe.join(", ") + ")";
 }
 
+    /**
+     * Day 3 of the Advent of Code challenge
+     * 
+     * Takes a string of mul(x,y) functions and returns the sum of the product of x and y in each function.
+     * @param {string} dataInput - string of functions
+     * @returns {number} - sum of the product of x and y in each function
+     */
 function day3(dataInput){
     let sum = 0;
     let amountValid = 0;
