@@ -1,8 +1,3 @@
-::-webkit-scrollbar {
-    width: 0px;
-    background: transparent;
-}
-
 @font-face {
     font-family: 'DRSEUSS';
     src: url('DRSEUSS.TTF') format('truetype');
@@ -27,7 +22,22 @@ body {
     background-color: var(--primary-color);
     color: var(--secondary-color);
     text-align: left;
-    overflow-y: hidden;
+    position: relative;
+}
+
+#bar{
+    position: fixed;
+    width: 4%;
+    height: 110%;
+    background: repeating-linear-gradient(
+      45deg,
+      var(--primary-color) 0,
+      var(--primary-color) 25px,
+      var(--tertiary-color) 0,
+      var(--tertiary-color) 50px
+    );
+    left: 0px;
+    top: -10vh;
 }
 
 button,select{
@@ -58,3 +68,4 @@ button,select{
 #result{
     color: var(--tertiary-color);
 }
+
