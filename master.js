@@ -4,7 +4,8 @@ const fileInput = document.getElementById('file-input');
 const uploadButton = document.getElementById('upload-button');
 const fileContentElement = document.querySelector('#file-content');
 const resultElement = document.querySelector('#result');
-const logElement = document.querySelector('#log');
+const troubleshoot = document.querySelector('#troubleshoot');
+const daySelect = document.getElementById('day-select');
 const reader = new FileReader(); // declare reader here
 
 uploadButton.addEventListener('click', (e) => {
@@ -63,6 +64,10 @@ function checkFileName(file, day) {
  * @throws {Error} If the day is invalid
  */
 function execute(dataInput, day) {
+  resultElement.textContent = "";
+  troubleshoot.textContent = "";
+  //fileContentElement.textContent = "";
+
   switch(day) {
     case 1:
       day1(dataInput);
@@ -649,7 +654,73 @@ function day8(dataInput){
   resultElement.textContent  = "Result: " + sum
 }
 
-function day9(){resultElement.textContent  = "Incompleted day"}
+function day9(dataInput){
+  let sum = 0;
+  let diskMap = []
+
+  //map puzzle input to disk map
+  for (let i = 0; i < dataInput.length; i += 2) {
+    diskMap.push({file: dataInput[i], freeSpace: dataInput[i + 1]}) 
+    //files:free space - index being placement inside array
+  }
+
+  //map diskmap to string
+  let stringMap = ""
+  for (let i = 0; i < diskMap.length; i += 1) {
+    for (let usedSpace = 0; usedSpace < diskMap[i].file; usedSpace += 1) {
+      stringMap += i
+    }
+    for (let freeSpace = 0; freeSpace < diskMap[i].freeSpace; freeSpace += 1) {
+      stringMap += "."
+    }
+  }
+
+  /*The amphipod would like to move file blocks one at a time from the 
+  end of the disk to the leftmost free space block (until there are no
+  gaps remaining between file blocks). */
+
+  let spacelessStringMap = '' //remove spaces so it just has file blocks, important to replace spaces with in next loop.
+  for (let i = 0; i < stringMap.length; i += 1) {
+    if (stringMap[i] != ".") {
+      spacelessStringMap += stringMap[i]
+  }}
+  let condensedStringMap = ""
+  let amountOfSpaces = stringMap.length - spacelessStringMap.length
+
+  for (let i = 0; i < stringMap.length; i += 1) {
+
+    if (stringMap[i] !== ".") {
+      condensedStringMap += stringMap[i];
+    } else {
+      condensedStringMap += spacelessStringMap.slice(-1);
+      spacelessStringMap = spacelessStringMap.slice(0, -1);
+    }
+
+    if (condensedStringMap.length + amountOfSpaces === stringMap.length) { //note: spacelessStringMap is now empty
+      condensedStringMap += ".".repeat(amountOfSpaces);
+      break;
+    }
+  }
+  /*The final step of this file-compacting process is to update the filesystem checksum. 
+  To calculate the checksum, add up the result of multiplying each of these blocks' position 
+  with the file ID number it contains. The leftmost block is in position 0. If a block contains
+  free space, skip it instead. */
+
+  for (let i = 0; i < condensedStringMap.length; i += 1) {
+    if (condensedStringMap[i] !== ".") {
+      sum += (i * parseInt(condensedStringMap[i]))
+    } else {
+      break //since there all the free space are at the end
+    }
+  }
+
+  // 
+  troubleshoot.textContent += "\nCondensed Disk Map: " + condensedStringMap
+  troubleshoot.textContent += "\nExpected Condensed Disk Map: 0099811188827773336446555566.............."
+  troubleshoot.textContent += "\nExpected Sum: 1928"
+
+  resultElement.textContent  = "Result: " + sum}
+
 function day10(){resultElement.textContent = "Incompleted day"}
 function day11(){resultElement.textContent = "Incompleted day"}
 function day12(){resultElement.textContent = "Incompleted day"}
