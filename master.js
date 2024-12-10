@@ -679,25 +679,26 @@ function day9(dataInput){
   end of the disk to the leftmost free space block (until there are no
   gaps remaining between file blocks). */
 
-  let spacelessStringMap = '' //remove spaces so it just has file blocks, important to replace spaces with in next loop.
+  let spacelessStringMap = []; 
   for (let i = 0; i < stringMap.length; i += 1) {
-    if (stringMap[i] != ".") {
-      spacelessStringMap += stringMap[i]
-  }}
-  let condensedStringMap = ""
-  let amountOfSpaces = stringMap.length - spacelessStringMap.length
-
-  for (let i = 0; i < stringMap.length; i += 1) {
-
     if (stringMap[i] !== ".") {
-      condensedStringMap += stringMap[i];
+      spacelessStringMap.push(parseInt(stringMap[i]));
+    }
+  }
+  let condensedStringMap = [];
+  let amountOfSpaces = stringMap.length - spacelessStringMap.length;
+
+  for (let i = 0; i < stringMap.length; i += 1) {
+    if (stringMap[i] !== ".") {
+      condensedStringMap.push(parseInt(stringMap[i]));
     } else {
-      condensedStringMap += spacelessStringMap.slice(-1);
-      spacelessStringMap = spacelessStringMap.slice(0, -1);
+      condensedStringMap.push(spacelessStringMap.pop());
     }
 
-    if (condensedStringMap.length + amountOfSpaces === stringMap.length) { //note: spacelessStringMap is now empty
-      condensedStringMap += ".".repeat(amountOfSpaces);
+    if (condensedStringMap.length + amountOfSpaces === stringMap.length) {
+      for (let j = 0; j < amountOfSpaces; j += 1) {
+        condensedStringMap.push(-1); // using -1 to represent empty space
+      }
       break;
     }
   }
