@@ -664,14 +664,14 @@ function day9(dataInput){
     //files:free space - index being placement inside array
   }
 
-  //map diskmap to string
-  let stringMap = ""
+  //map diskmap to stripped back array of data (either used or unused)
+  let diskMapData = []
   for (let i = 0; i < diskMap.length; i += 1) {
     for (let usedSpace = 0; usedSpace < diskMap[i].file; usedSpace += 1) {
-      stringMap += i
+      diskMapData.push(i)
     }
     for (let freeSpace = 0; freeSpace < diskMap[i].freeSpace; freeSpace += 1) {
-      stringMap += "."
+      diskMapData.push(".")
     }
   }
 
@@ -679,49 +679,47 @@ function day9(dataInput){
   end of the disk to the leftmost free space block (until there are no
   gaps remaining between file blocks). */
 
-  let spacelessStringMap = []; 
-  for (let i = 0; i < stringMap.length; i += 1) {
-    if (stringMap[i] !== ".") {
-      spacelessStringMap.push(parseInt(stringMap[i]));
-    }
-  }
-  let condensedStringMap = [];
-  let amountOfSpaces = stringMap.length - spacelessStringMap.length;
+  let spacelessDiskMap = [] //remove spaces so it just has file blocks, important to replace spaces with in next loop.
+  for (let i = 0; i < diskMapData.length; i += 1) {
+    if (diskMapData[i] != ".") {
+      spacelessDiskMap.push(diskMapData[i])
+  }}
+  
+  let  condensedDataMap = []
 
-  for (let i = 0; i < stringMap.length; i += 1) {
-    if (stringMap[i] !== ".") {
-      condensedStringMap.push(parseInt(stringMap[i]));
+  const amountOfSpaces = diskMapData.length - spacelessDiskMap.length
+
+  for (let i = 0; i < diskMapData.length; i += 1) {
+    if (diskMapData[i] !== ".") {
+      condensedDataMap.push(diskMapData[i]);
     } else {
-      condensedStringMap.push(spacelessStringMap.pop());
+      condensedDataMap.push(spacelessDiskMap.pop());
     }
-
-    if (condensedStringMap.length + amountOfSpaces === stringMap.length) {
-      for (let j = 0; j < amountOfSpaces; j += 1) {
-        condensedStringMap.push(-1); // using -1 to represent empty space
+    
+    if (condensedDataMap.length + amountOfSpaces === diskMapData.length) { //note: spacelessDiskMap is now empty
+      for (let i = 0; i < amountOfSpaces; i += 1) {
+        condensedDataMap.push(".")
       }
       break;
     }
   }
+
   /*The final step of this file-compacting process is to update the filesystem checksum. 
   To calculate the checksum, add up the result of multiplying each of these blocks' position 
   with the file ID number it contains. The leftmost block is in position 0. If a block contains
   free space, skip it instead. */
 
-  for (let i = 0; i < condensedStringMap.length; i += 1) {
-    if (condensedStringMap[i] !== ".") {
-      sum += (i * parseInt(condensedStringMap[i]))
-    } else {
-      break //since there all the free space are at the end
+  for (let i = 0; i < condensedDataMap.length; i += 1) {
+    if (condensedDataMap[i] !== ".") {
+      sum += (i * Number(condensedDataMap[i]));
     }
   }
-
-  // 
-  troubleshoot.textContent += "\nCondensed Disk Map: " + condensedStringMap
-  troubleshoot.textContent += "\nExpected Condensed Disk Map: 0099811188827773336446555566.............."
-  troubleshoot.textContent += "\nExpected Sum: 1928"
+  //troubleshoot.textContent += '\nDiskmap Data: ' + diskMapData
+  troubleshoot.textContent += "\nCondensed Disk Map: " + condensedDataMap
+  //troubleshoot.textContent += "\nExpected Condensed Disk Map: 0099811188827773336446555566.............."
 
   resultElement.textContent  = "Result: " + sum}
-
+  
 function day10(){resultElement.textContent = "Incompleted day"}
 function day11(){resultElement.textContent = "Incompleted day"}
 function day12(){resultElement.textContent = "Incompleted day"}
