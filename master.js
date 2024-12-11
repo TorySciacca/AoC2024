@@ -695,7 +695,7 @@ function day9(dataInput){
     } else {
       condensedDataMap.push(spacelessDiskMap.pop());
     }
-    
+
     if (condensedDataMap.length + amountOfSpaces === diskMapData.length) { //note: spacelessDiskMap is now empty
       for (let i = 0; i < amountOfSpaces; i += 1) {
         condensedDataMap.push(".")
@@ -718,9 +718,58 @@ function day9(dataInput){
   troubleshoot.textContent += "\nCondensed Disk Map: " + condensedDataMap
   //troubleshoot.textContent += "\nExpected Condensed Disk Map: 0099811188827773336446555566.............."
 
-  resultElement.textContent  = "Result: " + sum}
+  resultElement.textContent  = "Result: " + sum
+}
   
-function day10(){resultElement.textContent = "Incompleted day"}
+  function day10(dataInput){
+    let sum = 0;
+
+    // Map puzzle input into 2D array
+    console.log(dataInput)
+    const mappedData = dataInput.split("\n").map(row => row.split(""));
+    console.log(mappedData)
+
+    //Main recursive search function, loops till every PEAK
+    const searchTrail = function (x,y,level) {
+
+      const directions = [[-1, 0], [1, 0], [0, 1], [0, -1]];
+      for (let i = 0; i < directions.length; i += 1) {
+
+          let newX = (parseInt(x) + directions[i][0])
+          let newY = (parseInt(y) + directions[i][1])
+
+          if (newX >= 0 && newX < mappedData.length && newY >= 0 && newY < mappedData[newX].length) {
+            if (mappedData[newX][newY] == (level + 1)) {
+              let newLevel = level + 1;
+              console.log(mappedData[newX][newY], newLevel);
+              if (newLevel == PEAK) {
+                peaksFound.push([newX,newY])
+              } else {
+                searchTrail(newX, newY, newLevel);
+              }
+            }
+          }
+      }
+    }
+
+    //Loop through puzzle input to find trails
+    const TRAILHEAD = 0
+    const PEAK = 9
+    let peaksFound = [] 
+    for (let x = 0; x < mappedData.length; x += 1) {
+      for (let y = 0; y < mappedData[x].length; y += 1){
+        if (mappedData[x][y] == TRAILHEAD) {
+          peaksFound = []  // reset peaksFound
+          searchTrail(x,y,0)
+          const uniqueArr = Array.from(new Set(peaksFound.map(JSON.stringify)), JSON.parse);
+          sum += uniqueArr.length
+        }
+      }
+    }
+    troubleshoot.textContent = "Expected Result: 36(a), 550 (b)"
+    resultElement.textContent = "Result: " + sum
+  }
+
 function day11(){resultElement.textContent = "Incompleted day"}
 function day12(){resultElement.textContent = "Incompleted day"}
 function day13(){resultElement.textContent = "Incompleted day"}
