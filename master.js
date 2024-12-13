@@ -785,22 +785,22 @@ function day11(dataInput){
     the old stone's number multiplied by 2024 is engraved on the new stone.
  */
 
-    const splitEvenNumberedStone = (index) => {
-      const originalNum = stones[index];
-      const numStr = originalNum.toString();
-      const middleIndex = Math.floor(numStr.length / 2);
-      const leftNum = parseInt(numStr.slice(0, middleIndex), 10);
-      const rightNum = parseInt(numStr.slice(middleIndex), 10);
-      stones.splice(index, 1, leftNum, rightNum);
+    const splitStoneWithEvenNumberOfDigits = (index) => {
+      const number = stones[index];
+      const stringifiedNumber = number.toString();
+      const halfLength = stringifiedNumber.length / 2;
+      const leftHalf = parseInt(stringifiedNumber.slice(0, halfLength), 10);
+      const rightHalf = parseInt(stringifiedNumber.slice(halfLength), 10);
+      stones.splice(index, 1, leftHalf, rightHalf);
     };
 
     for (let blinksComplete = 0; blinksComplete < blinks; blinksComplete++) {
       let i = 0;
       while (i < stones.length) {
-        if (stones[i] === 0) {
+        if (parseInt(stones[i], 10) === 0) {
           stones[i] = 1; // RULE 1
         } else if (stones[i].toString().length % 2 === 0) {
-          splitEvenNumberedStone(i); // RULE 2
+          splitStoneWithEvenNumberOfDigits(i); // RULE 2
           i++; // Skip the next stone as it has just been added
         } else {
           stones[i] = parseInt(stones[i], 10) * 2024; // RULE 3
@@ -813,7 +813,7 @@ function day11(dataInput){
   resultElement.textContent = "Result: " + stones.length
   //troubleshoot.textContent = "Stone Data: " + stones
   troubleshoot.textContent = "\nExpected Result: 55312(a), 209412(b)"
-}
+} //ERROR - does not produce correct result, need to address
 
 function day12(){resultElement.textContent = "Incompleted day"}
 function day13(){resultElement.textContent = "Incompleted day"}
