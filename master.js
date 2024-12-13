@@ -725,9 +725,7 @@ function day9(dataInput){
     let sum = 0;
 
     // Map puzzle input into 2D array
-    console.log(dataInput)
     const mappedData = dataInput.split("\n").map(row => row.split(""));
-    console.log(mappedData)
 
     //Main recursive search function, loops till every PEAK
     const searchTrail = function (x,y,level) {
@@ -770,7 +768,53 @@ function day9(dataInput){
     resultElement.textContent = "Result: " + sum
   }
 
-function day11(){resultElement.textContent = "Incompleted day"}
+function day11(dataInput){
+
+  let stones = dataInput.split(" ")
+  let blinks = 25
+
+  /* RULES
+    1 - If the stone is engraved with the number 0, it is replaced by a stone engraved with the number 1.
+
+    2 -If the stone is engraved with a number that has an even number of digits, 
+        it is replaced by two stones. The left half of the digits are engraved on the new left stone, 
+        and the right half of the digits are engraved on the new right stone. (The new numbers don't 
+        keep extra leading zeroes: 1000 would become stones 10 and 0.)
+
+    3 -If none of the other rules apply, the stone is replaced by a new stone; 
+    the old stone's number multiplied by 2024 is engraved on the new stone.
+ */
+
+    const splitEvenNumberedStone = (index) => {
+      const originalNum = stones[index];
+      const numStr = originalNum.toString();
+      const middleIndex = Math.floor(numStr.length / 2);
+      const leftNum = parseInt(numStr.slice(0, middleIndex), 10);
+      const rightNum = parseInt(numStr.slice(middleIndex), 10);
+      stones.splice(index, 1, leftNum, rightNum);
+    };
+
+    for (let blinksComplete = 0; blinksComplete < blinks; blinksComplete++) {
+      let i = 0;
+      while (i < stones.length) {
+        if (stones[i] === 0) {
+          stones[i] = 1; // RULE 1
+        } else if (stones[i].toString().length % 2 === 0) {
+          splitEvenNumberedStone(i); // RULE 2
+          i++; // Skip the next stone as it has just been added
+        } else {
+          stones[i] = parseInt(stones[i], 10) * 2024; // RULE 3
+        }
+        i++;
+      }
+      console.log(blinksComplete, stones);
+    }
+
+  resultElement.textContent = "Result: " + stones.length
+  //troubleshoot.textContent = "Stone Data: " + stones
+  troubleshoot.textContent = "\nExpected Result: 55312(a), 209412(b)"
+}
+
 function day12(){resultElement.textContent = "Incompleted day"}
 function day13(){resultElement.textContent = "Incompleted day"}
 function day14(){resultElement.textContent = "Incompleted day"}
