@@ -721,7 +721,7 @@ function day9(dataInput){
   resultElement.textContent  = "Result: " + sum
 }
   
-  function day10(dataInput){
+ function day10(dataInput){
     let sum = 0;
 
     // Map puzzle input into 2D array
@@ -768,22 +768,26 @@ function day9(dataInput){
     resultElement.textContent = "Result: " + sum
   }
 
+  /**
+   * Takes a string of numbers separated by spaces and applies a series of rules
+   * to each number in sequence. The rules are:
+   * 1 - If the stone is engraved with the number 0, it is replaced by a stone
+   *     engraved with the number 1.
+   * 2 -If the stone is engraved with a number that has an even number of digits,
+   *     it is replaced by two stones. The left half of the digits are engraved on
+   *     the new left stone, and the right half of the digits are engraved on the
+   *     new right stone. (The new numbers don't keep extra leading zeroes: 1000
+   *     would become stones 10 and 0.)
+   * 3 -If none of the other rules apply, the stone is replaced by a new stone; the
+   *     old stone's number multiplied by 2024 is engraved on the new stone.
+   * The function continues to apply these rules until it has done so 25 times.
+   * The result is the total number of stones after all the rules have been applied.
+   * @param {string} dataInput - A string of numbers separated by spaces.
+   */
 function day11(dataInput){
 
   let stones = dataInput.split(" ")
   let blinks = 25
-
-  /* RULES
-    1 - If the stone is engraved with the number 0, it is replaced by a stone engraved with the number 1.
-
-    2 -If the stone is engraved with a number that has an even number of digits, 
-        it is replaced by two stones. The left half of the digits are engraved on the new left stone, 
-        and the right half of the digits are engraved on the new right stone. (The new numbers don't 
-        keep extra leading zeroes: 1000 would become stones 10 and 0.)
-
-    3 -If none of the other rules apply, the stone is replaced by a new stone; 
-    the old stone's number multiplied by 2024 is engraved on the new stone.
- */
 
     const splitStoneWithEvenNumberOfDigits = (index) => {
       const number = stones[index];
@@ -813,10 +817,106 @@ function day11(dataInput){
   resultElement.textContent = "Result: " + stones.length
   //troubleshoot.textContent = "Stone Data: " + stones
   troubleshoot.textContent = "\nExpected Result: 55312(a), 209412(b)"
-} //ERROR - does not produce correct result, need to address
+} 
+function day12(dataInput){
+  
+  let cost = 0
 
-function day12(){resultElement.textContent = "Incompleted day"}
-function day13(){resultElement.textContent = "Incompleted day"}
+  const mappedData = dataInput.split("\n").map(row => row.split(""));
+  console.log(mappedData)
+
+  // Disjoint-set data structure
+  const parent = {};
+  const rank = {};
+
+  // Initialize disjoint-set data structure
+  for (let x = 0; x < mappedData.length; x++) {
+    for (let y = 0; y < mappedData[x].length; y++) {
+      if (mappedData[x][y] !== " ") {
+        parent[`${x},${y}`] = `${x},${y}`;
+        rank[`${x},${y}`] = 0;
+      }
+    }
+  }
+
+  // Union function
+  const union = (x1, y1, x2, y2) => {
+    const root1 = find(x1, y1);
+    const root2 = find(x2, y2);
+    if (root1 !== root2) {
+      if (rank[root1] > rank[root2]) {
+        parent[root2] = root1;
+      } else if (rank[root1] < rank[root2]) {
+        parent[root1] = root2;
+      } else {
+        parent[root2] = root1;
+        rank[root1]++;
+      }
+    }
+  }
+
+  // Find function
+  const find = (x, y) => {
+    if (parent[`${x},${y}`] !== `${x},${y}`) {
+      parent[`${x},${y}`] = find(...parent[`${x},${y}`].split(","));
+    }
+    return parent[`${x},${y}`];
+  }
+
+  // Group connected letters together
+  for (let x = 0; x < mappedData.length; x++) {
+    for (let y = 0; y < mappedData[x].length; y++) {
+      if (mappedData[x][y] !== " ") {
+        const directions = [[-1, 0], [1, 0], [0, 1], [0, -1]];
+        for (const direction of directions) {
+          const newX = x + direction[0];
+          const newY = y + direction[1];
+          if (mappedData[newX] && mappedData[newX][newY] && mappedData[newX][newY] === mappedData[x][y]) {
+            union(x, y, newX, newY);
+          }
+        }
+      }
+    }
+  }
+
+  // Calculate area and perimeter for each region
+  const regions = {};
+  for (let x = 0; x < mappedData.length; x++) {
+    for (let y = 0; y < mappedData[x].length; y++) {
+      if (mappedData[x][y] !== " ") {
+        const root = find(x, y);
+        if (!regions[root]) {
+          regions[root] = { area: 0, perimeter: 0 };
+        }
+        regions[root].area++;
+        const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+        for (const direction of directions) {
+          const newX = x + direction[0];
+          const newY = y + direction[1];
+          if (!mappedData[newX] || !mappedData[newX][newY] || mappedData[newX][newY] !== mappedData[x][y]) {
+            regions[root].perimeter++;
+          }
+        }
+      }
+    }
+  }
+  // Calculate cost
+  for (const region in regions) {
+    cost += regions[region].area * regions[region].perimeter;
+  }
+
+  console.log(regions)
+
+  resultElement.textContent = "Result: " + cost
+  troubleshoot.textContent = "Expected Result: 1930(a)"
+}
+
+function day13(dataInput){
+
+  
+  resultElement.textContent = "Incompleted day"}
+
+
 function day14(){resultElement.textContent = "Incompleted day"}
 function day15(){resultElement.textContent = "Incompleted day"}
 function day16(){resultElement.textContent = "Incompleted day"}
