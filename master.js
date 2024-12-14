@@ -913,9 +913,34 @@ function day12(dataInput){
 
 function day13(dataInput){
 
-  
-  resultElement.textContent = "Incompleted day"}
+  let buttonACost = 3
+  let buttonBCost = 1
 
+  //break down input :)
+  let clawMachines = dataInput.split('\n\n')
+
+  for (let i = 0; i < clawMachines.length; i++){
+    let clawMachineData = clawMachines[i].split('\n')
+    let buttonA = clawMachineData[0].split(': ')[1].split(', ')
+    let buttonB = clawMachineData[1].split(': ')[1].split(', ')
+    let prizeLocation = clawMachineData[2].split(': ')[1].split(', ')
+    prizeLocation = [parseInt(prizeLocation[0].split('=')[1]),parseInt(prizeLocation[1].split('=')[1])]
+
+    buttonA = {x:parseInt(buttonA[0].split('+')[1]),y:parseInt(buttonA[1].split('+')[1])}
+    buttonB = {x:parseInt(buttonB[0].split('+')[1]),y:parseInt(buttonB[1].split('+')[1])}
+
+    console.log(i,buttonA,buttonB)
+    console.log(i,prizeLocation)
+  }
+
+  //
+
+  //No more than 100 inputs per button
+  
+  resultElement.textContent = "Result: "
+  troubleshoot.textContent = "Expected Result: 480(a)"
+
+}
 
 function day14(){resultElement.textContent = "Incompleted day"}
 function day15(){resultElement.textContent = "Incompleted day"}
