@@ -912,13 +912,44 @@ function day12(dataInput){
 }
 
 function day13(dataInput){
-
+  let sum = 0
   let buttonACost = 3
   let buttonBCost = 1
 
   //break down input :)
   let clawMachines = dataInput.split('\n\n')
 
+  //
+  const solveLinearEquations = (a, b, c, d, e, f) => {
+      // Calculate the determinant
+      const determinant = (a * e) - (b * d);
+    
+      // Check if the determinant is zero
+      if (determinant === 0) {
+        return 0 // "No unique solution exists";
+      }
+    
+      // Calculate x and y
+      const x = ((c * e) - (b * f)) / determinant;
+      const y = ((a * f) - (c * d)) / determinant;
+      
+      //check if x and y are integers
+      if (!Number.isInteger(x) || !Number.isInteger(y)) {
+        return 0 // "No unique solution exists";
+      }
+
+      // Check if x and y are under 100
+      if (x < 0 || y < 0 || x > 100 || y > 100) {
+        return 0 // "No unique solution exists";
+      }
+
+      // Calculate cost
+      const cost = buttonACost * x + buttonBCost * y
+      console.log(x,y,cost)
+      return cost ;
+  }
+
+  //
   for (let i = 0; i < clawMachines.length; i++){
     let clawMachineData = clawMachines[i].split('\n')
     let buttonA = clawMachineData[0].split(': ')[1].split(', ')
@@ -931,14 +962,12 @@ function day13(dataInput){
 
     console.log(i,buttonA,buttonB)
     console.log(i,prizeLocation)
+    sum += solveLinearEquations(buttonA.x,buttonB.x,prizeLocation[0],buttonA.y,buttonB.y,prizeLocation[1])
   }
 
-  //
-
-  //No more than 100 inputs per button
   
-  resultElement.textContent = "Result: "
-  troubleshoot.textContent = "Expected Result: 480(a)"
+  resultElement.textContent = "Result: " + sum
+  troubleshoot.textContent = "Expected Result: 480(a) 35729(b)"
 
 }
 
