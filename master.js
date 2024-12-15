@@ -971,14 +971,75 @@ function day13(dataInput){
 
 }
 
-function day14(){resultElement.textContent = "Incompleted day"}
-function day15(){resultElement.textContent = "Incompleted day"}
-function day16(){resultElement.textContent = "Incompleted day"}
-function day17(){resultElement.textContent = "Incompleted day"}
-function day18(){resultElement.textContent = "Incompleted day"}
-function day19(){resultElement.textContent = "Incompleted day"}
-function day20(){resultElement.textContent = "Incompleted day"}
-function day21(){resultElement.textContent = "Incompleted day"}
-function day22(){resultElement.textContent = "Incompleted day"}
-function day23(){resultElement.textContent = "Incompleted day"}
-function day24(){resultElement.textContent = "Incompleted day"}
+function day14(dataInput){
+  let sum = 0
+  let simulationTime = 100 //seconds
+  let gridWidth = 101 //x
+  let gridLength = 103 //y
+  
+  let gridCenterXPath = Math.round(gridWidth/2) -1 
+  let gridCenterYPath = Math.round(gridLength/2)- 1
+  console.log(gridCenterXPath,gridCenterYPath)
+
+  //break down input 
+  let robotMovements = dataInput.split('\n')
+
+  let quadrents = {1:0,2:0,3:0,4:0}
+
+  for (let i = 0; i < robotMovements.length; i++){
+
+    //build robot object from data
+    let robotPosition = robotMovements[i].split(' ')[0].split('p=')[1].split(',')
+    let robotVelocity = robotMovements[i].split(' ')[1].split('v=')[1].split(',')
+
+    let robot = {
+      x: parseInt(robotPosition[0]),
+      y: parseInt(robotPosition[1]),
+      xVelocity: parseInt(robotVelocity[0]),
+      yVelocity: parseInt(robotVelocity[1])
+    };
+
+    //run simulation for t
+
+    for (let t = 0; t < simulationTime; t++){
+      //check if robot will out of bounds, if so loop around grid
+
+      robot.x = (robot.x + robot.xVelocity + gridWidth) % gridWidth;
+      robot.y = (robot.y + robot.yVelocity + gridLength) % gridLength;
+    }
+    //check final quadrent position (excluding middle *always odd width/length)
+    if (robot.x != gridCenterXPath && robot.y != gridCenterYPath) {
+      if (robot.x < gridCenterXPath && robot.y < gridCenterYPath) {
+        quadrents[1] += 1
+        robot['quadrent'] = 1
+      } else if (robot.x > gridCenterXPath && robot.y < gridCenterYPath) {
+        quadrents[2] += 1
+        robot['quadrent'] = 2
+      } else if (robot.x > gridCenterXPath && robot.y > gridCenterYPath) {
+        quadrents[4] += 1
+        robot['quadrent'] = 4
+      } else if (robot.x < gridCenterXPath && robot.y > gridCenterYPath) {
+        quadrents[3] += 1
+        robot['quadrent'] = 3
+      }
+    }
+    console.log(i,robot)
+
+  }
+  console.log(quadrents,quadrents[1] + quadrents[2] + quadrents[3] + quadrents[4])
+  //get safety factor (all quadrents mutiplied together)
+  sum = quadrents[1] * quadrents[2] * quadrents[3] * quadrents[4]
+
+  resultElement.textContent = "Result: " + sum
+  troubleshoot.textContent = "Expected Result: 12(a) 216772608(b)"
+}
+function day15(dataInput){resultElement.textContent = "Incompleted day"}
+function day16(dataInput){resultElement.textContent = "Incompleted day"}
+function day17(dataInput){resultElement.textContent = "Incompleted day"}
+function day18(dataInput){resultElement.textContent = "Incompleted day"}
+function day19(dataInput){resultElement.textContent = "Incompleted day"}
+function day20(dataInput){resultElement.textContent = "Incompleted day"}
+function day21(dataInput){resultElement.textContent = "Incompleted day"}
+function day22(dataInput){resultElement.textContent = "Incompleted day"}
+function day23(dataInput){resultElement.textContent = "Incompleted day"}
+function day24(dataInput){resultElement.textContent = "Incompleted day"}
