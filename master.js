@@ -1033,8 +1033,98 @@ function day14(dataInput){
   resultElement.textContent = "Result: " + sum
   troubleshoot.textContent = "Expected Result: 12(a) 216772608(b)"
 }
-function day15(dataInput){resultElement.textContent = "Incompleted day"}
-function day16(dataInput){resultElement.textContent = "Incompleted day"}
+function day15(dataInput){
+  //Glossary:
+  // @ = Robot, O = Box, # = Wall
+  // ^ v < > = up, down, left, right
+
+  //Rules:
+  //Robot follows instructions one step at a time
+  //However, if this action would cause the robot or a box (0) to 
+  //move into a wall (#), nothing moves instead, including the robot.
+
+  //Data Splitting
+  let sum = 0
+  let mapData = dataInput.split('\n\n')[0].split('\n')
+  let instructions = dataInput.split('\n\n')[1]
+  let robotPosition = []  //x,y
+
+  //Find robot starting position within map
+  for (let x = 0; x < mapData.length; x++){
+    for (let y = 0; y < mapData[x].length; y++){
+      if (mapData[x][y] == '@'){
+        robotPosition = [x,y]
+        console.log(robotPosition)
+      }
+    }
+  }
+
+  //convert mapData to array of arrays [[x0y0],[x0y1],...]
+  let mapArray = []
+  for (let i = 0; i < mapData.length; i++){
+    let row = []
+    for (let j = 0; j < mapData[i].length; j++){
+      row.push(mapData[i][j])
+    }
+    mapArray.push(row)
+  }
+
+  mapArray.forEach(row => console.log(row));
+
+  //Recursive function to ray cast movement and move boxes if needed, only updates when empty space is found
+  const rayCastBox = (x, y, direction, character) => {
+    const directionMap = {
+      '^': [-1, 0],
+      'v': [1, 0],
+      '>': [0, 1],
+      '<': [0, -1]
+    };
+    console.log(character,direction)
+    const [dx, dy] = directionMap[direction];
+    const newX = x + dx;
+    const newY = y + dy;
+
+    if (newX < 0 || newX >= mapArray.length || newY < 0 || newY >= mapArray[0].length) {return [x, y];}
+
+    if (mapArray[newX][newY] === 'O') {
+      rayCastBox(newX, newY, direction, 'O');
+    }
+
+    if (mapArray[newX][newY] === '.') {
+      mapArray[x][y] = '.';
+      mapArray[newX][newY] = character;
+
+    }
+
+    if (mapArray[newX][newY] === '@') {
+      robotPosition = [newX, newY];
+    }
+
+  };
+
+  //Run instructions
+  for (let i = 0; i < instructions.length; i++){
+    if (instructions[i] == '\n') {continue}
+    const currentPos = robotPosition;
+    rayCastBox(currentPos[0], currentPos[1], instructions[i], '@');
+  }
+
+  mapArray.forEach(row => console.log(row));
+
+  // Find total sum of GPS values of all boxes ("O")
+  // GPS = (100 * yPos) + xPos
+  for (let i = 0; i < mapArray.length; i++){ for (let j = 0; j < mapArray[i].length; j++){if (mapArray[i][j] == 'O'){sum += (100 * i) + j}}}
+
+  resultElement.textContent = "Result: " + sum
+  troubleshoot.textContent = "Expected Result: 2028(a i) 10092(a ii) 1457740(b)"
+}
+
+function day16(dataInput){
+
+  //implement a* pathfinding
+
+  resultElement.textContent = "Incompleted day"
+}
 function day17(dataInput){resultElement.textContent = "Incompleted day"}
 function day18(dataInput){resultElement.textContent = "Incompleted day"}
 function day19(dataInput){resultElement.textContent = "Incompleted day"}
@@ -1043,3 +1133,5 @@ function day21(dataInput){resultElement.textContent = "Incompleted day"}
 function day22(dataInput){resultElement.textContent = "Incompleted day"}
 function day23(dataInput){resultElement.textContent = "Incompleted day"}
 function day24(dataInput){resultElement.textContent = "Incompleted day"}
+
+//A Star Pathfinding
