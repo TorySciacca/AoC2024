@@ -1120,10 +1120,93 @@ function day15(dataInput){
 }
 
 function day16(dataInput){
+  //Map input to 2D array :p
 
-  //implement a* pathfinding
+  let mapData = dataInput.split('\n\n')[0].split('\n')
+  console.log(mapData)
 
-  resultElement.textContent = "Incompleted day"
+  let startPos = [mapData[0].length - 2, 1]
+  let endPos = [1, mapData[0].length - 2] 
+
+  console.log('Start and End Positions: ',startPos,mapData[startPos[0]][startPos[1]], endPos,mapData[endPos[0]][endPos[1]])
+
+  //Store lowest possible score: moving forward = +1, turning 90° = +1000
+  //Could be more genereric by inserting an array but f**k it, just need to solve the aoc problem
+
+  let lowestScore = Infinity 
+
+  const pathFinder = (startPos,endPos,lastPath) => {
+
+    let directions = [[-1, 0], [1, 0], [0, 1], [0, -1]] //north, south, east, west
+
+    let path = {
+      score: 0,
+      positionHistory: [startPos],
+      lastDirection: [0, -1]  //reindeer starts facing west wall (idk why)
+    }
+
+    if (lastPath != null){path = lastPath} //load previous path if exists
+
+    let targetPos = [startPos[0] + path.lastDirection[0], startPos[1] + path.lastDirection[1]]
+    let continueSearch = true
+
+    //If next space is not free continue to check directions
+    if (continueSearch) {
+        
+      for (let i = 0; i < 3; i++){
+        continueSearch = true
+        //If next space is free: continue search
+        if (i == 0){
+          if (mapData[targetPos[0]][targetPos[1]] != '.') {
+            continueSearch = false
+          }
+        } else if (i == 1){
+          //If next space is wall check left aka 90° (costs 1000 points to turn)
+          let leftPos = [startPos[0] - path.lastDirection[1], startPos[1] + path.lastDirection[0]]
+
+          if (mapData[leftPos[0]][leftPos[1]] === '.') {
+            path.score  += 1000
+            targetPos = leftPos
+            path.lastDirection = [-path.lastDirection[1], path.lastDirection[0]]
+          } else{continueSearch = false}
+
+        } else if (i == 2){
+          let rightPos = [startPos[0] + path.lastDirection[1], startPos[1] - path.lastDirection[0]]
+
+          if (mapData[rightPos[0]][rightPos[1]] === '.') {
+            path.score  += 1000
+            targetPos = rightPos
+            path.lastDirection = [path.lastDirection[1], -path.lastDirection[0]]
+          }else{continueSearch = false}
+        }
+
+        //Else If next space is already in visited array: end search
+        if ((path.positionHistory.some(pos => pos[0] === targetPos[0] && pos[1] === targetPos[1]))) {
+          continueSearch = false}
+
+        //If found E, compare if score is lower than lowest score. Save new  lowest score.
+        if (targetPos === endPos) {
+          console.log(path);
+          continueSearch = false;
+          if (path.score < lowestScore) {
+            lowestScore = path.score
+          }}
+          
+        if (continueSearch) {
+          console.log(i,path,mapData[targetPos[0]][targetPos[1]])
+          path.score += 1;
+          path.positionHistory.push(targetPos);
+          pathFinder(targetPos,endPos,path)
+        }
+
+      } 
+    }
+
+  }
+  pathFinder(startPos,endPos,null)
+
+  resultElement.textContent = "Result: " + lowestScore
+  troubleshoot.textContent = "Expected Result: 11,048(a) <120,464(b)"
 }
 function day17(dataInput){resultElement.textContent = "Incompleted day"}
 function day18(dataInput){resultElement.textContent = "Incompleted day"}
@@ -1134,4 +1217,4 @@ function day22(dataInput){resultElement.textContent = "Incompleted day"}
 function day23(dataInput){resultElement.textContent = "Incompleted day"}
 function day24(dataInput){resultElement.textContent = "Incompleted day"}
 
-//A Star Pathfinding
+//A*
