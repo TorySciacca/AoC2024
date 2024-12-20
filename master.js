@@ -1199,46 +1199,6 @@ function day17(dataInput){
 
   console.log(registerA, registerB, registerC, instructions)
 
-
-  /*
-  The eight instructions are as follows:
-
-    The adv instruction (opcode 0) performs division. 
-    The numerator is the value in the A register.
-    The denominator is found by raising 2 to the power of the instruction's combo operand. 
-    (So, an operand of 2 would divide A by 4 (2^2); an operand of 5 would divide A by 2^B.) 
-    The result of the division operation is truncated to an integer and then written to the A register.
-
-    The bxl instruction (opcode 1) calculates the bitwise XOR of register B and the instruction's literal operand, 
-    then stores the result in register B.
-
-    The bst instruction (opcode 2) calculates the value of its combo operand modulo 8 
-    (thereby keeping only its lowest 3 bits), then writes that value to the B register.
-
-    The jnz instruction (opcode 3) does nothing if the A register is 0. However, if the A register is not zero, 
-    it jumps by setting the instruction pointer to the value of its literal operand; if this instruction jumps,
-      the instruction pointer is not increased by 2 after this instruction.
-
-    The bxc instruction (opcode 4) calculates the bitwise XOR of register B and register C, then stores the 
-    result in register B. (For legacy reasons, this instruction reads an operand but ignores it.)
-
-    The out instruction (opcode 5) calculates the value of its combo operand modulo 8, then outputs that value. 
-    (If a program outputs multiple values, they are separated by commas.)
-
-    The bdv instruction (opcode 6) works exactly like the adv instruction except that the result is stored 
-    in the B register. (The numerator is still read from the A register.)
-
-    The cdv instruction (opcode 7) works exactly like the adv instruction except that the result is stored 
-    in the C register. (The numerator is still read from the A register.)
-
-  ........................................................................................................
-  Your first task is to determine what the program is trying to output. 
-  To do this, initialize the registers to the given values, then run the given program, 
-  collecting any output produced by out instructions. 
-  NOTE: (Always join the values produced by out instructions with commas.)
-
- */
-
   //return oprand value
   const getOperandValue = (operand) => {
     switch (operand) {
@@ -1303,7 +1263,7 @@ function day17(dataInput){
 
     //run opcode and jump if opcode 3
     if (runOpcode(parseInt(instructions[i]), parseInt(instructions[i+1])) === 'opcode 3'){
-      if (totalLoops < loopMax) {i = (parseInt(instructions[i+1])- 2)} //jump pointer to literal opcode -1 given +2 at end of loop
+      if (totalLoops < loopMax) {i = (parseInt(instructions[i+1])- 2)} //jump pointer to literal opcode -2 given +2 at end of loop
     }
     console.log('Register A: ',registerA,' Register B: ',registerB,' Register C: ',registerC)
 
@@ -1314,8 +1274,78 @@ function day17(dataInput){
 }
 function day18(dataInput){
 
-  resultElement.textContent = "Incompleted day";
-  troubleshoot.textContent = "Expected Result: "}
+  let corruptedCoords = dataInput.split('\n').map(row => row.split(','));
+
+  let byteLimit = 1024 //example = 12, actual = 1024
+  let validCoords = corruptedCoords.slice(0,byteLimit);
+
+  console.log(corruptedCoords)
+  //create X by X array, mapping 'corrupted'/walls to 1 and free spaces to 0
+  let arraySize = 71 // example = 7, actual = 71
+  let mapArray = Array.from({length: arraySize}, () => Array(arraySize).fill(0));
+
+  for (let i = 0; i < validCoords.length; i++){
+    mapArray[validCoords[i][1]][validCoords[i][0]] = 1;
+  }
+
+  let startPos = [0,0]
+  let endPos = [mapArray.length -1, mapArray[0].length -1]
+  console.log(startPos,endPos)
+  function aStar(map, start, end) {
+    let openList = [start];
+    let closedList = new Set();
+    let cameFrom = {};
+    let gScore = {};
+    let fScore = {};
+
+    gScore[start] = 0;
+    fScore[start] = heuristic(start, end);
+
+    const directions = [[0, -1], [0, 1], [-1, 0], [1, 0]];
+    const validNeighbors = (node) => directions.map(d => [node[0] + d[0], node[1] + d[1]]).filter(n => n[0] >= 0 && n[0] < map[0].length && n[1] >= 0 && n[1] < map.length && map[n[1]][n[0]] !== 1);
+
+    while (openList.length > 0) {
+      let current = openList[0];
+      for (let i = 1; i < openList.length; i++) {
+        if (fScore[openList[i]] < fScore[current]) {
+          current = openList[i];
+        }
+      }
+      if (current[0] === end[0] && current[1] === end[1]) {
+        let path = [current];
+        while (current in cameFrom) {
+          current = cameFrom[current];
+          path.unshift(current);
+        }
+        return path;
+      }
+      openList.splice(openList.indexOf(current), 1);
+      closedList.add(current);
+      for (let n of validNeighbors(current)) {
+        let tentativeGScore = gScore[current] + 1;
+        if (!gScore.hasOwnProperty(n) || tentativeGScore < gScore[n]) {
+          cameFrom[n] = current;
+          gScore[n] = tentativeGScore;
+          fScore[n] = gScore[n] + heuristic(n, end);
+          if (!openList.includes(n)) {
+            openList.push(n);
+          }
+        }
+      }
+    }
+    return [];
+  }
+
+  function heuristic(a, b) {
+    return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
+  }
+  let shortestPath = aStar(mapArray,startPos, endPos)
+  console.log(shortestPath.length - 1)
+  console.log(mapArray)
+  
+
+  resultElement.textContent = "Result: " + (shortestPath.length - 1);
+  troubleshoot.textContent = "Expected Result: 22(a), 308(b)"}
 
 function day19(dataInput){
 
