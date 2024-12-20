@@ -1190,9 +1190,127 @@ function day16(dataInput){
 
 function day17(dataInput){
 
+  let registerA = parseInt(dataInput.split('\n\n')[0].split('\n')[0].split(': ')[1])
+  let registerB = parseInt(dataInput.split('\n\n')[0].split('\n')[1].split(': ')[1])
+  let registerC = parseInt(dataInput.split('\n\n')[0].split('\n')[2].split(': ')[1])
 
-  resultElement.textContent = "Incompleted day";
-  troubleshoot.textContent = "Expected Result: "
+  let instructions = dataInput.split('\n\n')[1].split(': ')[1].split(',')
+  let output = []
+
+  console.log(registerA, registerB, registerC, instructions)
+
+
+  /*
+  The eight instructions are as follows:
+
+    The adv instruction (opcode 0) performs division. 
+    The numerator is the value in the A register.
+    The denominator is found by raising 2 to the power of the instruction's combo operand. 
+    (So, an operand of 2 would divide A by 4 (2^2); an operand of 5 would divide A by 2^B.) 
+    The result of the division operation is truncated to an integer and then written to the A register.
+
+    The bxl instruction (opcode 1) calculates the bitwise XOR of register B and the instruction's literal operand, 
+    then stores the result in register B.
+
+    The bst instruction (opcode 2) calculates the value of its combo operand modulo 8 
+    (thereby keeping only its lowest 3 bits), then writes that value to the B register.
+
+    The jnz instruction (opcode 3) does nothing if the A register is 0. However, if the A register is not zero, 
+    it jumps by setting the instruction pointer to the value of its literal operand; if this instruction jumps,
+      the instruction pointer is not increased by 2 after this instruction.
+
+    The bxc instruction (opcode 4) calculates the bitwise XOR of register B and register C, then stores the 
+    result in register B. (For legacy reasons, this instruction reads an operand but ignores it.)
+
+    The out instruction (opcode 5) calculates the value of its combo operand modulo 8, then outputs that value. 
+    (If a program outputs multiple values, they are separated by commas.)
+
+    The bdv instruction (opcode 6) works exactly like the adv instruction except that the result is stored 
+    in the B register. (The numerator is still read from the A register.)
+
+    The cdv instruction (opcode 7) works exactly like the adv instruction except that the result is stored 
+    in the C register. (The numerator is still read from the A register.)
+
+  ........................................................................................................
+  Your first task is to determine what the program is trying to output. 
+  To do this, initialize the registers to the given values, then run the given program, 
+  collecting any output produced by out instructions. 
+  NOTE: (Always join the values produced by out instructions with commas.)
+
+ */
+
+  //return oprand value
+  const getOperandValue = (operand) => {
+    switch (operand) {
+      case 0:
+        return 0;
+      case 1:
+        return 1;
+      case 2:
+        return 2;
+      case 3:
+        return 3;
+      case 4:
+        return parseInt(registerA);
+      case 5:
+        return parseInt(registerB);
+      case 6:
+        return parseInt(registerC);
+      default:
+        console.log('Invalid operand')
+        return 0;
+    }
+  }
+
+  //run opcode
+  const runOpcode = (opcode, operand) => {
+    switch (opcode){
+      case 0: //Performs division. The numerator is the value in the A register. The denominator is found by raising 2 to the power of the instruction's combo operand. The result of the division operation is truncated to an integer and then written to the A register
+        registerA = Math.trunc(registerA / (2 ** getOperandValue(operand)));
+        break
+      case 1: //Calculates the bitwise XOR of register B and the instruction's literal operand, then stores the result in register B.
+        registerB = registerB ^ operand;
+        break
+      case 2: //Calculates the value of its combo operand modulo 8, then writes that value to the B register.
+        registerB = getOperandValue(operand) % 8;
+        break
+      case 3: //does nothing if the A register is 0. However, if the A register is not zero, it jumps by setting the instruction pointer to the value of its literal operand; if this instruction jumps,the instruction pointer is not increased by 2 after this instruction.
+        if (registerA === 0){break}  else {return 'opcode 3'}
+      case 4: //Calculates the bitwise XOR of register B and register C, then stores the result in register B. (For legacy reasons, this instruction reads an operand but ignores it.)
+        registerB = registerB ^ registerC;
+        break;
+      case 5: //Calculates the value of its combo operand modulo 8, then outputs that value. (If a program outputs multiple values, they are separated by commas.)
+        output.push(getOperandValue(operand) % 8);
+        break;
+      case 6: //Works exactly like the adv instruction except that the result is stored in the B register. (The numerator is still read from the A register.)
+        registerB = Math.trunc(registerA / (2 ** getOperandValue(operand)));
+        break
+      case 7: //Works exactly like the adv instruction except that the result is stored in the C register. (The numerator is still read from the A register.)
+        registerC = Math.trunc(registerA / (2 ** getOperandValue(operand)));
+        break
+      default:
+        console.log('Invalid opcode')
+        return 0
+    }
+  }
+  let totalLoops = 0;
+  let loopMax = 1000; //limit to prevent infinite loop, increase if needed
+
+  //run instructions
+  for (let i = 0; i < instructions.length; i+=2){
+    totalLoops++
+    console.log(totalLoops,'Ran instruction ',i/2,'opcode: ',instructions[i],' oprand: ',instructions[i+1])
+
+    //run opcode and jump if opcode 3
+    if (runOpcode(parseInt(instructions[i]), parseInt(instructions[i+1])) === 'opcode 3'){
+      if (totalLoops < loopMax) {i = (parseInt(instructions[i+1])- 2)} //jump pointer to literal opcode -1 given +2 at end of loop
+    }
+    console.log('Register A: ',registerA,' Register B: ',registerB,' Register C: ',registerC)
+
+  }
+  console.log(output)
+  resultElement.textContent = "Result: " + output.join(',');
+  troubleshoot.textContent = "Expected Result: 4,6,3,5,6,3,5,2,1,0(a), 2,3,6,2,1,6,1,2,1(b)"
 }
 function day18(dataInput){
 
