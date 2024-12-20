@@ -1131,90 +1131,105 @@ function day16(dataInput){
   console.log('Start and End Positions: ',startPos,mapData[startPos[0]][startPos[1]], endPos,mapData[endPos[0]][endPos[1]])
 
   //Store lowest possible score: moving forward = +1, turning 90° = +1000
-  //Could be more genereric by inserting an array but f**k it, just need to solve the aoc problem
+  // Initally coded with Recursion but bigger grids took too long, so switched to A* 
+  // A* code adapted from https://www.redblobgames.com/pathfinding/a-star/implementation.html
 
   let lowestScore = Infinity 
 
-  const pathFinder = (startPos,endPos,lastPath) => {
-
-    let directions = [[-1, 0], [1, 0], [0, 1], [0, -1]] //north, south, east, west
-
-    let path = {
-      score: 0,
-      positionHistory: [startPos],
-      lastDirection: [0, -1]  //reindeer starts facing west wall (idk why)
-    }
-
-    if (lastPath != null){path = lastPath} //load previous path if exists
-
-    let targetPos = [startPos[0] + path.lastDirection[0], startPos[1] + path.lastDirection[1]]
-    let continueSearch = true
-
-    //If next space is not free continue to check directions
-    if (continueSearch) {
-        
-      for (let i = 0; i < 3; i++){
-        continueSearch = true
-        //If next space is free: continue search
-        if (i == 0){
-          if (mapData[targetPos[0]][targetPos[1]] != '.') {
-            continueSearch = false
-          }
-        } else if (i == 1){
-          //If next space is wall check left aka 90° (costs 1000 points to turn)
-          let leftPos = [startPos[0] - path.lastDirection[1], startPos[1] + path.lastDirection[0]]
-
-          if (mapData[leftPos[0]][leftPos[1]] === '.') {
-            path.score  += 1000
-            targetPos = leftPos
-            path.lastDirection = [-path.lastDirection[1], path.lastDirection[0]]
-          } else{continueSearch = false}
-
-        } else if (i == 2){
-          let rightPos = [startPos[0] + path.lastDirection[1], startPos[1] - path.lastDirection[0]]
-
-          if (mapData[rightPos[0]][rightPos[1]] === '.') {
-            path.score  += 1000
-            targetPos = rightPos
-            path.lastDirection = [path.lastDirection[1], -path.lastDirection[0]]
-          }else{continueSearch = false}
-        }
-
-        //Else If next space is already in visited array: end search
-        if ((path.positionHistory.some(pos => pos[0] === targetPos[0] && pos[1] === targetPos[1]))) {
-          continueSearch = false}
-
-        //If found E, compare if score is lower than lowest score. Save new  lowest score.
-        if (targetPos === endPos) {
-          console.log(path);
-          continueSearch = false;
-          if (path.score < lowestScore) {
-            lowestScore = path.score
-          }}
-          
-        if (continueSearch) {
-          console.log(i,path,mapData[targetPos[0]][targetPos[1]])
-          path.score += 1;
-          path.positionHistory.push(targetPos);
-          pathFinder(targetPos,endPos,path)
-        }
-
-      } 
-    }
-
+  function createNode(x, y, score, previousDirection) {
+    const heuristic = (x, y) => Math.abs(x - mapData.length) + Math.abs(y - mapData[0].length);
+    return { x, y, score, previousDirection, heuristic: heuristic(x, y) };
   }
-  pathFinder(startPos,endPos,null)
+
+  function searchTrail(x, y, pathsVisited, score, previousDirection) {
+    const directions = [[-1, 0], [1, 0], [0, 1], [0, -1]];
+  
+    const openList = []; // priority queue
+    const closedList = new Set(); // keep track of visited nodes
+  
+    openList.push(createNode(x, y, score, previousDirection));
+  
+    while (openList.length > 0) {
+      const currentNode = openList.shift();
+  
+      if (closedList.has(`${currentNode.x},${currentNode.y}`)) {
+        continue;
+      }
+  
+      closedList.add(`${currentNode.x},${currentNode.y}`);
+  
+      if (mapData[currentNode.x][currentNode.y] === 'E') {
+        if (currentNode.score < lowestScore) {
+          lowestScore = currentNode.score;
+        }
+      } else {
+        for (let i = 0; i < directions.length; i += 1) {
+          const dx = directions[i][0];
+          const dy = directions[i][1];
+          const newX = currentNode.x + dx;
+          const newY = currentNode.y + dy;
+  
+          if (newX >= 0 && newX < mapData.length && newY >= 0 && newY < mapData[0].length && mapData[newX][newY] !== '#' && !closedList.has(`${newX},${newY}`)) {
+            const directionChangePenalty = currentNode.previousDirection && currentNode.previousDirection[0] * dx + currentNode.previousDirection[1] * dy === 0 ? 1000 : 0;
+            const newScore = currentNode.score + 1 + directionChangePenalty;
+            const node = createNode(newX, newY, newScore, [dx, dy]);
+  
+            openList.push(node);
+            openList.sort((a, b) => (a.score + a.heuristic) - (b.score + b.heuristic));
+          }
+        }
+      }
+    }
+  }
+
+  searchTrail(startPos[0], startPos[1],[], 0,[0, -1])
 
   resultElement.textContent = "Result: " + lowestScore
-  troubleshoot.textContent = "Expected Result: 11,048(a) <120,464(b)"
+  troubleshoot.textContent = "Expected Result: 11,048(a) 115,500(b)"
 }
-function day17(dataInput){resultElement.textContent = "Incompleted day"}
-function day18(dataInput){resultElement.textContent = "Incompleted day"}
-function day19(dataInput){resultElement.textContent = "Incompleted day"}
-function day20(dataInput){resultElement.textContent = "Incompleted day"}
-function day21(dataInput){resultElement.textContent = "Incompleted day"}
-function day22(dataInput){resultElement.textContent = "Incompleted day"}
-function day23(dataInput){resultElement.textContent = "Incompleted day"}
-function day24(dataInput){resultElement.textContent = "Incompleted day"}
 
-//A*
+function day17(dataInput){
+
+
+  resultElement.textContent = "Incompleted day";
+  troubleshoot.textContent = "Expected Result: "
+}
+function day18(dataInput){
+
+  resultElement.textContent = "Incompleted day";
+  troubleshoot.textContent = "Expected Result: "}
+
+function day19(dataInput){
+
+  resultElement.textContent = "Incompleted day";
+  troubleshoot.textContent = "Expected Result: "}
+  
+function day20(dataInput){
+
+  resultElement.textContent = "Incompleted day";
+  troubleshoot.textContent = "Expected Result: "}
+  
+function day21(dataInput){
+
+  resultElement.textContent = "Incompleted day";
+  troubleshoot.textContent = "Expected Result: "}
+  
+function day22(dataInput){
+
+  resultElement.textContent = "Incompleted day";
+  troubleshoot.textContent = "Expected Result: "}
+  
+function day23(dataInput){
+
+  resultElement.textContent = "Incompleted day";
+  troubleshoot.textContent = "Expected Result: "}
+  
+function day24(dataInput){
+
+  resultElement.textContent = "Incompleted day";
+  troubleshoot.textContent = "Expected Result: "}
+  
+function day25(dataInput){
+
+  resultElement.textContent = "Incompleted day";
+  troubleshoot.textContent = "Expected Result: "}
