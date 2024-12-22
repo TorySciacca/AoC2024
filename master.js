@@ -14,8 +14,10 @@ uploadButton.addEventListener('click', (e) => {
     fileContentString = event.target.result;
     fileContentElement.textContent = 'Data: ' + fileContentString;
     const day = parseInt(document.getElementById('day-select').value, 10);
+    const t0 = performance.now();
     if (checkFileName(fileInput.files[0], day)) {execute(fileContentString, day);}
-    console.log('Script Complete for Day ' + day)
+    const t1 = performance.now();
+    console.log(`Script Complete for Day ${day}, Execution took ${t1 - t0} milliseconds.`)
   };
   reader.readAsText(fileInput.files[0]);
 });
@@ -1349,13 +1351,67 @@ function day18(dataInput){
 
 function day19(dataInput){
 
-  resultElement.textContent = "Incompleted day";
-  troubleshoot.textContent = "Expected Result: "}
+  let availableTowels = dataInput.split("\n\n")[0].split(", ")
+  console.log(availableTowels)
+
+  let requestedDesigns = dataInput.split("\n\n")[1].split("\n")
+  console.log(requestedDesigns)
+
+  let totalPosibleDesigns = 0
+
+  requestedDesigns.forEach(design => {
+    let tempDesign = ""
+    let isPossible = true
+    let possibleTowels = []
+
+    availableTowels.forEach(towel => {
+      if (design.includes(towel)) {
+        possibleTowels.push(towel)
+        isPossible = true
+      }
+    });
+
+    console.log(design,possibleTowels) //for troubleshooting
+    function buildTempDesign(design, possibleTowels) { //uses Dijkstra's algorithm
+      const queue = [{ currentDesign: "", cost: 0 }];
+      const visited = new Set();
+
+      while (queue.length > 0) {
+        queue.sort((a, b) => a.cost - b.cost);
+        const { currentDesign, cost } = queue.shift();
+
+        if (currentDesign === design) return true;
+        if (visited.has(currentDesign)) continue;
+        visited.add(currentDesign);
+
+        for (let towel of possibleTowels) {
+          const newDesign = currentDesign + towel;
+          if (design.startsWith(newDesign) && !visited.has(newDesign)) {
+            queue.push({ currentDesign: newDesign, cost: cost + 1 });
+          }
+        }
+      }
+      return false;
+    }
+
+    const possibleDesignsSet = new Set(requestedDesigns);
+    for (let design of possibleDesignsSet) {
+      if (buildTempDesign(design, possibleTowels)) {
+        possibleDesignsSet.delete(design);
+        totalPosibleDesigns++;
+      }
+    }
+    requestedDesigns = Array.from(possibleDesignsSet);
+
+  });
+
+  resultElement.textContent = "Result: " + totalPosibleDesigns;
+  troubleshoot.textContent = "Expected Result: 6(a) 350(b)"}
   
 function day20(dataInput){
 
   resultElement.textContent = "Incompleted day";
-  troubleshoot.textContent = "Expected Result: "}
+  troubleshoot.textContent = "Expected Result: 6(a)"}
   
 function day21(dataInput){
 
