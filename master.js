@@ -1293,61 +1293,14 @@ function day18(dataInput){
   let startPos = [0,0]
   let endPos = [mapArray.length -1, mapArray[0].length -1]
   console.log(startPos,endPos)
-  function aStar(map, start, end) {
-    let openList = [start];
-    let closedList = new Set();
-    let cameFrom = {};
-    let gScore = {};
-    let fScore = {};
 
-    gScore[start] = 0;
-    fScore[start] = heuristic(start, end);
-
-    const directions = [[0, -1], [0, 1], [-1, 0], [1, 0]];
-    const validNeighbors = (node) => directions.map(d => [node[0] + d[0], node[1] + d[1]]).filter(n => n[0] >= 0 && n[0] < map[0].length && n[1] >= 0 && n[1] < map.length && map[n[1]][n[0]] !== 1);
-
-    while (openList.length > 0) {
-      let current = openList[0];
-      for (let i = 1; i < openList.length; i++) {
-        if (fScore[openList[i]] < fScore[current]) {
-          current = openList[i];
-        }
-      }
-      if (current[0] === end[0] && current[1] === end[1]) {
-        let path = [current];
-        while (current in cameFrom) {
-          current = cameFrom[current];
-          path.unshift(current);
-        }
-        return path;
-      }
-      openList.splice(openList.indexOf(current), 1);
-      closedList.add(current);
-      for (let n of validNeighbors(current)) {
-        let tentativeGScore = gScore[current] + 1;
-        if (!gScore.hasOwnProperty(n) || tentativeGScore < gScore[n]) {
-          cameFrom[n] = current;
-          gScore[n] = tentativeGScore;
-          fScore[n] = gScore[n] + heuristic(n, end);
-          if (!openList.includes(n)) {
-            openList.push(n);
-          }
-        }
-      }
-    }
-    return [];
-  }
-
-  function heuristic(a, b) {
-    return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
-  }
   let shortestPath = aStar(mapArray,startPos, endPos)
   console.log(shortestPath.length - 1)
   console.log(mapArray)
   
 
   resultElement.textContent = "Result: " + (shortestPath.length - 1);
-  troubleshoot.textContent = "Expected Result: 22(a), 308(b)"}
+  troubleshoot.textContent = "Expected Result: 22(a), 308(b) Note: example uses smaller array, actual uses larger array"}
 
 function day19(dataInput){
 
@@ -1360,7 +1313,6 @@ function day19(dataInput){
   let totalPosibleDesigns = 0
 
   requestedDesigns.forEach(design => {
-    let tempDesign = ""
     let isPossible = true
     let possibleTowels = []
 
@@ -1409,9 +1361,83 @@ function day19(dataInput){
   troubleshoot.textContent = "Expected Result: 6(a) 350(b)"}
   
 function day20(dataInput){
+  // 1. loop map find start and end positions
+  // 2. run A* on start and end positions = baseline score
+  // 3. loop through map and find all points where reindeer can 'cheat'
+  // 4. run A* on all points where reindeer can 'cheat'
+  // 5. compare scores
+  // 6. return highest score
 
-  resultElement.textContent = "Incompleted day";
-  troubleshoot.textContent = "Expected Result: 6(a)"}
+  let map = dataInput.split("\n").map(row => row.split(""));
+
+  const createMap = (map, cheatPos) => {
+    const newMap = Array.from({length: map.length}, () => Array(map[0].length).fill(0));
+    for (let i = 0; i < map.length; i++) {
+      for (let j = 0; j < map[i].length; j++) {
+        if (map[i][j] === "#") {
+          newMap[i][j] = 1 // walls
+        } else if (map[i][j] === "S" || map[i][j] === "E") {
+          newMap[i][j] = 0 // empty space
+        }
+      }
+    }
+    newMap[cheatPos[0]][cheatPos[1]] = 0
+    return newMap;
+  }
+
+  let startPos = []
+  let endPos = []
+  for (i = 0; i < map.length; i++) {for (j = 0; j < map[i].length; j++) {
+      if (map[i][j] === "S") {startPos = [i, j]}
+      if (map[i][j] === "E") {endPos = [i, j]}
+  }}
+
+  let baselineMap = createMap(map, startPos)
+  let baselineScore = dijkstra(baselineMap,startPos, endPos)
+  baselineScore = baselineScore.length - 1
+
+  let totalCheatsThatSave100Picoseconds = 0
+
+  const findCheats = (map, i, j,baselineUpToCheatScore) => {
+
+    let cheat = dijkstra(createMap(map, [i,j]), [i,j], endPos)
+
+    let cheatScore = cheat.length - 1
+
+    let timeSaved = baselineScore - (cheatScore + baselineUpToCheatScore)
+    if (timeSaved >= 100) {totalCheatsThatSave100Picoseconds += 1;console.log(`${totalCheatsThatSave100Picoseconds} / 1417`)}
+  }
+  for (let i = 1; i < map.length - 1; i++) {for (let j = 1; j < map[i].length - 1; j++) {
+      if (map[i][j] !== "#") {continue}
+      
+      if ((map[i-1][j] === "." || map[i-1][j] === "S") && (map[i+1][j] === "." || map[i+1][j] === "E")) {
+        //findCheats(map, startPos[0], startPos[1],0)
+        let baselineUpToCheat = dijkstra(baselineMap, startPos, [i,j])
+        let baselineUpToCheatScore = baselineUpToCheat.length - 1
+        let newX = i - 1
+        let newY = j
+        findCheats(map, newX, newY,baselineUpToCheatScore)
+        newX = i + 1
+        findCheats(map, newX, newY,baselineUpToCheatScore)
+
+      } else if ((map[i][j-1] === "." || map[i][j-1] === "S") && (map[i][j+1] === "." || map[i][j+1] === "E")) {
+        //findCheats(map, startPos[0], startPos[1],0)
+        let baselineUpToCheat = dijkstra(baselineMap, startPos, [i,j])
+        let baselineUpToCheatScore = baselineUpToCheat.length - 1
+        let newY = j - 1
+        let newX = i
+        findCheats(map, newX, newY,baselineUpToCheatScore)
+        newY = j + 1
+        findCheats(map, newX, newY,baselineUpToCheatScore)
+      }
+  }};
+
+  console.log(`There are ${totalCheatsThatSave100Picoseconds} cheats that save at least 100 picoseconds.`)
+
+ //How many cheats would save you at least 100 picoseconds/moves?
+
+  resultElement.textContent = "Result: " + totalCheatsThatSave100Picoseconds;
+  troubleshoot.textContent = "Expected Result: ?(a) 1417(b)"}
   
 function day21(dataInput){
 
@@ -1437,3 +1463,95 @@ function day25(dataInput){
 
   resultElement.textContent = "Incompleted day";
   troubleshoot.textContent = "Expected Result: "}
+
+//A*
+function aStar(map, start, end) {
+  let openList = [start];
+  let closedList = new Set();
+  let cameFrom = {};
+  let gScore = {};
+  let fScore = {};
+
+  gScore[start] = 0;
+  fScore[start] = heuristic(start, end);
+
+  const directions = [[0, -1], [0, 1], [-1, 0], [1, 0]];
+  const validNeighbors = (node) => directions.map(d => [node[0] + d[0], node[1] + d[1]]).filter(n => n[0] >= 0 && n[0] < map[0].length && n[1] >= 0 && n[1] < map.length && map[n[1]][n[0]] !== 1);
+
+  while (openList.length > 0) {
+    let current = openList[0];
+    for (let i = 1; i < openList.length; i++) {
+      if (fScore[openList[i]] < fScore[current]) {
+        current = openList[i];
+      }
+    }
+    if (current[0] === end[0] && current[1] === end[1]) {
+      let path = [current];
+      while (current in cameFrom) {
+        current = cameFrom[current];
+        path.unshift(current);
+      }
+      return path;
+    }
+    openList.splice(openList.indexOf(current), 1);
+    closedList.add(current);
+    for (let n of validNeighbors(current)) {
+      let tentativeGScore = gScore[current] + 1;
+      if (!gScore.hasOwnProperty(n) || tentativeGScore < gScore[n]) {
+        cameFrom[n] = current;
+        gScore[n] = tentativeGScore;
+        fScore[n] = gScore[n] + heuristic(n, end);
+        if (!openList.includes(n)) {
+          openList.push(n);
+        }
+      }
+    }
+  }
+  return [];
+}
+
+function heuristic(a, b) {
+  return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
+}
+
+function dijkstra(map, start, end) {
+  let queue = [start]
+  let distances = Array.from({length: map.length}, () => Array(map[0].length).fill(Infinity))
+  distances[start[0]][start[1]] = 0
+  let directions = [[-1,0], [1,0], [0,-1], [0,1]]
+
+  while (queue.length > 0) {
+    let pos = queue.shift()
+    if (pos[0] === end[0] && pos[1] === end[1]) {
+      break
+    }
+    for (let dir of directions) {
+      let newPos = [pos[0] + dir[0], pos[1] + dir[1]]
+      if (newPos[0] >= 0 && newPos[0] < map.length && newPos[1] >= 0 && newPos[1] < map[0].length && map[newPos[0]][newPos[1]] !== 1) {
+        let newDist = distances[pos[0]][pos[1]] + 1
+        if (newDist < distances[newPos[0]][newPos[1]]) {
+          distances[newPos[0]][newPos[1]] = newDist
+          queue.push(newPos)
+        }
+      }
+    }
+  }
+  let path = []
+  let currPos = end
+  while (currPos[0] !== start[0] || currPos[1] !== start[1]) {
+    path.push(currPos)
+    let minDist = Infinity
+    let nextPos = null
+    for (let dir of directions) {
+      let newPos = [currPos[0] + dir[0], currPos[1] + dir[1]]
+      if (newPos[0] >= 0 && newPos[0] < map.length && newPos[1] >= 0 && newPos[1] < map[0].length && distances[newPos[0]][newPos[1]] < minDist) {
+        minDist = distances[newPos[0]][newPos[1]]
+        nextPos = newPos
+      }
+    }
+    currPos = nextPos
+  }
+  path.push(start)
+  path.reverse()
+  return path
+}
