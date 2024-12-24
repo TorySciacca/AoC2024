@@ -1361,12 +1361,6 @@ function day19(dataInput){
   troubleshoot.textContent = "Expected Result: 6(a) 350(b)"}
   
 function day20(dataInput){
-  // 1. loop map find start and end positions
-  // 2. run A* on start and end positions = baseline score
-  // 3. loop through map and find all points where reindeer can 'cheat'
-  // 4. run A* on all points where reindeer can 'cheat'
-  // 5. compare scores
-  // 6. return highest score
 
   let map = dataInput.split("\n").map(row => row.split(""));
 
@@ -1403,38 +1397,28 @@ function day20(dataInput){
     let cheat = dijkstra(createMap(map, [i,j]), [i,j], endPos)
 
     let cheatScore = cheat.length - 1
-
     let timeSaved = baselineScore - (cheatScore + baselineUpToCheatScore)
-    if (timeSaved >= 100) {totalCheatsThatSave100Picoseconds += 1;console.log(`${totalCheatsThatSave100Picoseconds} / 1417`)}
+    //Compare the Manhattan distance between both points, to see if the cheat is allowed and how much it saves. 
+    if (timeSaved >= 100) {
+      totalCheatsThatSave100Picoseconds += 1;
+      console.log(`${totalCheatsThatSave100Picoseconds} / 1417`)
+    }
   }
+
   for (let i = 1; i < map.length - 1; i++) {for (let j = 1; j < map[i].length - 1; j++) {
       if (map[i][j] !== "#") {continue}
-      
-      if ((map[i-1][j] === "." || map[i-1][j] === "S") && (map[i+1][j] === "." || map[i+1][j] === "E")) {
-        //findCheats(map, startPos[0], startPos[1],0)
-        let baselineUpToCheat = dijkstra(baselineMap, startPos, [i,j])
-        let baselineUpToCheatScore = baselineUpToCheat.length - 1
-        let newX = i - 1
-        let newY = j
-        findCheats(map, newX, newY,baselineUpToCheatScore)
-        newX = i + 1
-        findCheats(map, newX, newY,baselineUpToCheatScore)
 
-      } else if ((map[i][j-1] === "." || map[i][j-1] === "S") && (map[i][j+1] === "." || map[i][j+1] === "E")) {
-        //findCheats(map, startPos[0], startPos[1],0)
-        let baselineUpToCheat = dijkstra(baselineMap, startPos, [i,j])
-        let baselineUpToCheatScore = baselineUpToCheat.length - 1
-        let newY = j - 1
-        let newX = i
-        findCheats(map, newX, newY,baselineUpToCheatScore)
-        newY = j + 1
-        findCheats(map, newX, newY,baselineUpToCheatScore)
+      if ((map[i-1][j] === "." || map[i-1][j] === "S") && (map[i+1][j] === "." || map[i+1][j] === "E")) {
+        findCheats(map, i-1, j, dijkstra(baselineMap, startPos, [i,j]).length)
+        findCheats(map, i+1, j, dijkstra(baselineMap, startPos, [i,j]).length)
+      }  
+      if ((map[i][j-1] === "." || map[i][j-1] === "S") && (map[i][j+1] === "." || map[i][j+1] === "E")) {
+        findCheats(map, i, j - 1, dijkstra(baselineMap, startPos, [i,j]).length)
+        findCheats(map, i, j + 1, dijkstra(baselineMap, startPos, [i,j]).length)
       }
   }};
 
   console.log(`There are ${totalCheatsThatSave100Picoseconds} cheats that save at least 100 picoseconds.`)
-
- //How many cheats would save you at least 100 picoseconds/moves?
 
   resultElement.textContent = "Result: " + totalCheatsThatSave100Picoseconds;
   troubleshoot.textContent = "Expected Result: ?(a) 1417(b)"}
