@@ -1390,7 +1390,7 @@ function day20(dataInput){
   let baselineScore = dijkstra(baselineMap,startPos, endPos)
   baselineScore = baselineScore.length - 1
 
-  let totalCheatsThatSave100Picoseconds = 0
+  let totalCheatsThatSave100Picoseconds = 2
 
   const findCheats = (map, i, j,baselineUpToCheatScore) => {
 
@@ -1425,8 +1425,143 @@ function day20(dataInput){
   
 function day21(dataInput){
 
-  resultElement.textContent = "Incompleted day";
-  troubleshoot.textContent = "Expected Result: "}
+  let instructionsNeeded = dataInput.split("\n");
+
+  /* 
+  FINAL KEYPAD 
+    0   1   2
+  +---+---+---+
+  | 7 | 8 | 9 | 0
+  +---+---+---+
+  | 4 | 5 | 6 | 1
+  +---+---+---+
+  | 1 | 2 | 3 | 2
+  +---+---+---+
+      | 0 | A | 3
+      +---+---+
+  
+  ROBOT KEYPAD
+
+    0   1   2   
+      +---+---+
+      | ^ | A | 0
+  +---+---+---+
+  | < | v | > | 1
+  +---+---+---+
+
+  NOTE: Starting position is always 'A'
+
+  In summary, there are the following keypads:
+
+    1 directional keypad that you are using.
+    2 directional keypads that robots are using.
+    1 numeric keypad (on a door) that a robot is using.
+
+  */
+
+  const numericLookup = {
+    '7': [0, 0],
+    '8': [0, 1],
+    '9': [0, 2],
+    '4': [1, 0],
+    '5': [1, 1],
+    '6': [1, 2],
+    '1': [2, 0],
+    '2': [2, 1],
+    '3': [2, 2],
+    '0': [3, 1],
+    'A': [3, 2]
+  };
+
+  let directionalLookup = {
+    '^': [0, 1],
+    'A': [0, 2],
+    '<': [1, 0],
+    'v': [1, 1],
+    '>': [1, 2]
+  };
+
+  const getShortestSequence = (instructionsNeeded) => {
+
+    let totalCommands = [instructionsNeeded]
+    let shortestSequence = ''
+
+    let numericKeypadIndex = numericLookup['A']
+
+    for (let i = 0; i < instructionsNeeded.length; i++) {
+      shortestSequence += directionalToNumeric(instructionsNeeded[i], numericKeypadIndex)
+      numericKeypadIndex = numericLookup[instructionsNeeded[i]];
+    }
+    totalCommands.push(shortestSequence)
+
+    for (let j = 0; j < 2; j++) {
+      let directionalKeypadIndex = directionalLookup['A'] //reset
+      shortestSequence = ''
+      for (let i = 0; i < totalCommands[j+1].length; i++) {
+        shortestSequence += directionalToDirectional(totalCommands[j+1][i], directionalKeypadIndex)
+        directionalKeypadIndex = directionalLookup[totalCommands[j+1][i]];
+      }
+      totalCommands.push(shortestSequence)
+    }
+
+    console.log(totalCommands)
+    return totalCommands[3].length
+  }
+
+  const directionalToNumeric = (resultNeeded, numericKeypadIndex) => {
+    //eg: resultNeeded = '0', output = ',A' (given directionalKeypadIndex = [0,2] -> [0,1] then 'A' to confirm)
+    let indexNeeded = numericLookup[resultNeeded]
+  
+    let indexDiff = [indexNeeded[0] - numericKeypadIndex[0], indexNeeded[1] - numericKeypadIndex[1]]
+    let path = indexDiff.map((diff, i) => {
+      let direction = diff > 0 ? (i === 0 ? 'v' : '>') : (i === 0 ? '^' : '<')
+      return direction.repeat(Math.abs(diff))
+    }).join('')
+
+    return  path + 'A'
+  }
+
+  const directionalToDirectional = (resultNeeded, directionalKeypadIndex) => {
+
+    const indexNeeded = directionalLookup[resultNeeded];
+    const indexDiff = [indexNeeded[0] - directionalKeypadIndex[0], indexNeeded[1] - directionalKeypadIndex[1]];
+
+    let path = '';
+    for (let i = 0; i < 2; i++) {
+      if (indexDiff[i] !== 0) {
+        path += (i === 0 ? (indexDiff[i] > 0 ? 'v' : '^') : (indexDiff[i] > 0 ? '>' : '<')).repeat(Math.abs(indexDiff[i]));
+      }
+    }
+
+    let pathArray = path.split('');
+    pathArray.sort((a,b) => ['v','<','>','^'].indexOf(a) - ['v','<','>','^'].indexOf(b));
+    path = pathArray.join('');
+
+    return path + 'A';
+    //console.log(directionalKeypadIndex,indexNeeded,path,'A', resultNeeded)
+  }
+
+  //The sum of the complexities of the five codes on your list
+  let totalComplexity = 0
+
+  for (let i = 0; i < instructionsNeeded.length; i++) {
+    let shortestSequence = getShortestSequence(instructionsNeeded[i])
+    console.log(`Shortest sequence of button presses for instructions to run ${instructionsNeeded[i]}: ${shortestSequence}`)
+    
+    let numericPart = parseInt(instructionsNeeded[i].replace(/[A]/g, ''));
+    let complexity = shortestSequence * numericPart
+
+    totalComplexity += complexity
+    console.log(`Complexity of code ${instructionsNeeded[i]}: ${complexity} (${shortestSequence} * ${numericPart})`)
+    //break
+  }
+  //379A: <v<A>>^AvA^A<vA<AA>>^AAvA<^A>AAvA^A<vA>^AA<A>A<v<A>A>^AAAvA<^A>A
+
+  //      <A>A<AA<vAA>>^AvAA^A<vAAA>^A
+  //379A: <<vA>>^AvA^A<<vA>>^AA<<vA>A>^AAvAA<^A>A<vA>^AA<A>A<<vA>A>^AAAvA<^A>A
+  console.log(`Total complexity: ${totalComplexity}`)
+  resultElement.textContent =  totalComplexity;
+  troubleshoot.textContent = "Expected Result: 126384(a) 215374(b)"}
   
 function day22(dataInput){
 
@@ -1539,3 +1674,4 @@ function dijkstra(map, start, end) {
   path.reverse()
   return path
 }
+
