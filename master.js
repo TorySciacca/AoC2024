@@ -1601,8 +1601,69 @@ function day22(dataInput){
   
 function day23(dataInput){
 
-  resultElement.textContent = "Incompleted day";
-  troubleshoot.textContent = "Expected Result: "}
+  /* LAN PARTY NETWORK SEARCH
+
+  Find all the sets of three inter-connected computers. 
+  How many contain at least one computer with a name that starts with t?
+  */
+
+  const totalConnections = dataInput.split("\n")
+
+  let totalUniqueConnections = {} 
+  let totalInterConnections = []
+  let totalConnectionsWithT = 0
+
+  // Map all connections between computers as sets of 3
+  totalConnections.forEach(connection => {
+    const [computer1, computer2] = connection.split("-");
+
+    if (!totalUniqueConnections[computer1]) totalUniqueConnections[computer1] = new Set();
+    if (!totalUniqueConnections[computer2]) totalUniqueConnections[computer2] = new Set();
+    totalUniqueConnections[computer1].add(computer2);
+    totalUniqueConnections[computer2].add(computer1);
+  });
+
+  for (const computer1 in totalUniqueConnections) {
+    totalUniqueConnections[computer1].forEach(computer2 => {
+      totalUniqueConnections[computer2].forEach(computer3 => {
+        if (totalUniqueConnections[computer3].has(computer1) && computer1 !== computer2 && computer1 !== computer3 && computer2 !== computer3) {
+          const sortedConnection = [computer1, computer2, computer3].sort().join(',');
+          if (!totalInterConnections.includes(sortedConnection)) {
+            totalInterConnections.push(sortedConnection);
+          }
+        }
+      });
+    });
+  }
+
+  // Filter totalInterConnections to ensure all nodes are unique connections
+  const uniqueInterConnections = new Set();
+
+  totalInterConnections.forEach(connection => {
+    const nodes = connection.split(',');
+    const sortedNodes = nodes.sort((a, b) => a.localeCompare(b)).join(',');
+    uniqueInterConnections.add(sortedNodes);
+  });
+
+  const filteredConnections = Array.from(uniqueInterConnections).filter(connection => {
+    const nodes = connection.split(',');
+    return new Set(nodes).size === 3;
+  });
+
+  console.log(filteredConnections)
+
+  //How many contain at least one computer with a name that starts with t?
+  for (let i = 0; i < filteredConnections.length; i++) {
+    const connection = filteredConnections[i];
+    const [node1, node2, node3] = connection.split(',');
+    if (node1.startsWith('t') || node2.startsWith('t') || node3.startsWith('t')) {
+      totalConnectionsWithT++;
+      console.log(connection)
+    }
+  }
+
+  resultElement.textContent = `Result: ${totalConnectionsWithT}`;
+  troubleshoot.textContent = "Expected Result: 7(a) 1314(b)"}
   
 function day24(dataInput){
 
