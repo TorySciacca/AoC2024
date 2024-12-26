@@ -1424,7 +1424,8 @@ function day20(dataInput){
   troubleshoot.textContent = "Expected Result: ?(a) 1417(b)"}
   
 function day21(dataInput){
-
+  //incomplete -- shortest path is either slightly under or over the actual shortest path, 
+  //not optimized corectly due to not checking every single possible path's effect on subsequent paths
   let instructionsNeeded = dataInput.split("\n");
 
   /* 
@@ -1565,7 +1566,37 @@ function day21(dataInput){
   
 function day22(dataInput){
 
-  resultElement.textContent = "Incompleted day";
+  const intialSecretNumbers = dataInput.split("\n")
+  let finalSecretNumbers = []
+  let sumTotal = 0
+  
+  for (let i = 0; i < intialSecretNumbers.length; i++) {
+    let initalSecretNumber = parseInt(intialSecretNumbers[i])
+
+    let secretNumber = initalSecretNumber
+    for (let j = 0; j < 2000; j++) { //
+      // (If the secret number is 42 and you were to mix 15 into the secret number, the secret number would become 37.)
+      //To mix a value into the secret number, calculate the bitwise XOR of the given value and the secret number.
+      const mixAndPrune = (secret, mixValue) => {
+        return ((secret ^ mixValue) % 16777216 + 16777216) % 16777216;
+      };
+      secretNumber = mixAndPrune(secretNumber, secretNumber * 64); //Step 1
+      secretNumber = mixAndPrune(secretNumber, Math.floor(secretNumber / 32)); //Step 2
+      secretNumber = mixAndPrune(secretNumber, secretNumber * 2048); //Step 3
+    }
+    finalSecretNumbers.push(secretNumber)
+    finalSecretNumbers[i]
+    sumTotal += secretNumber
+    //console.log(initalSecretNumber,secretNumber) //expected: 123 -> 15887950
+    //break //for testing purposes
+  }
+
+
+
+  console.log(`Expected results:\n\n1: 8685429\n10: 4700978\n100: 15273692\n2024: 8667524`)
+  console.log(`Total: ${sumTotal}`)
+
+  resultElement.textContent = `Result: ${sumTotal}`;
   troubleshoot.textContent = "Expected Result: "}
   
 function day23(dataInput){
