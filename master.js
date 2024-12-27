@@ -143,6 +143,9 @@ function execute(dataInput, day) {
     case 24:
       day24(dataInput);
       break;
+    case 25:
+      day25(dataInput);
+      break;
     default:
       console.log("Invalid day");
   }
@@ -1718,10 +1721,55 @@ function day24(dataInput){
   
 function day25(dataInput){
 
-  resultElement.textContent = "Incompleted day";
-  troubleshoot.textContent = "Expected Result: "}
+  //Analyze your lock and key schematics. 
 
-//A*
+  const locksAndKeys = dataInput.split('\n\n')
+  let locks = []
+  let keys = []
+
+  for (i = 0; i < locksAndKeys.length; i++) {
+    //input eg: "#####\n.####\n.####\n.####\n.#.#.\n.#...\n....."
+    let input = locksAndKeys[i].split('\n')
+    let output = [0,0,0,0,0]
+
+    //map into array of heights, output eg:[1,2,5,3]
+    for (let col = 0; col < input[0].length; col++) {
+      let height = 0;
+      for (let row = 0; row < input.length; row++) {
+        if (input[row][col] == '#') {
+          height++;
+        }
+      }
+      output[col] = height -1 ;
+    }
+
+    if (input[0][0] == '#') {
+      locks.push(output) 
+    } else {
+      keys.push(output)
+    }
+  }
+
+  console.log(locks,keys)
+
+  //How many unique lock/key pairs fit together without overlapping in any column?
+
+  let uniquePairs = 0
+
+  for (const lock of locks) {
+    for (const key of keys) {
+      const overlap = lock.every((height, index) => (height + key[index]) <= 5);
+      if (overlap) {
+        console.log(lock, key);
+        uniquePairs++;
+      }
+    }
+  }
+
+  resultElement.textContent = `Result: ${uniquePairs} `;
+  troubleshoot.textContent = "Expected Result:  3(a) 3360(b)"}
+
+//Sorting Algorithms
 function aStar(map, start, end) {
   let openList = [start];
   let closedList = new Set();
