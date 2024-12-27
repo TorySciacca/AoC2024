@@ -1,4 +1,15 @@
-//AoC Master JS File
+//AoC 2024 Master JS File
+
+/*
+This file is the master JavaScript file for the Advent of Code 2024 project. 
+It runs the code for the day selected in the HTML file. 
+The code is organized into functions, each of which is named after the day it is used for. 
+
+The functions are passed the data from the file as an argument. 
+The functions are expected to return a string that is the answer to the day's challenge. 
+The answer is then displayed in the 'result' paragraph element in the HTML file. 
+The functions are also expected to handle any errors that may occur.
+*/
 
 const fileInput = document.getElementById('file-input');
 const uploadButton = document.getElementById('upload-button');
@@ -12,11 +23,12 @@ uploadButton.addEventListener('click', (e) => {
   let fileContentString;
   reader.onload = (event) => {
     fileContentString = event.target.result;
-    fileContentElement.textContent = 'Data: ' + fileContentString;
     const day = parseInt(document.getElementById('day-select').value, 10);
     const t0 = performance.now();
     if (checkFileName(fileInput.files[0], day)) {execute(fileContentString, day);}
     const t1 = performance.now();
+    fileContentElement.textContent = `Execution took ${t1 - t0} milliseconds.\n`
+    fileContentElement.textContent += 'Data: ' + fileContentString;
     console.log(`Script Complete for Day ${day}, Execution took ${t1 - t0} milliseconds.`)
   };
   reader.readAsText(fileInput.files[0]);
@@ -1303,7 +1315,8 @@ function day18(dataInput){
   
 
   resultElement.textContent = "Result: " + (shortestPath.length - 1);
-  troubleshoot.textContent = "Expected Result: 22(a), 308(b) Note: example uses smaller array, actual uses larger array"}
+  troubleshoot.textContent = "Expected Result: 22(a), 308(b) Note: example uses smaller array, actual uses larger array"
+}
 
 function day19(dataInput){
 
@@ -1361,7 +1374,8 @@ function day19(dataInput){
   });
 
   resultElement.textContent = "Result: " + totalPosibleDesigns;
-  troubleshoot.textContent = "Expected Result: 6(a) 350(b)"}
+  troubleshoot.textContent = "Expected Result: 6(a) 350(b)"
+}
   
 function day20(dataInput){
 
@@ -1424,7 +1438,8 @@ function day20(dataInput){
   console.log(`There are ${totalCheatsThatSave100Picoseconds} cheats that save at least 100 picoseconds.`)
 
   resultElement.textContent = "Result: " + totalCheatsThatSave100Picoseconds;
-  troubleshoot.textContent = "Expected Result: ?(a) 1417(b)"}
+  troubleshoot.textContent = "Expected Result: ?(a) 1417(b)"
+}
   
 function day21(dataInput){
   //incomplete -- shortest path is either slightly under or over the actual shortest path, 
@@ -1565,7 +1580,8 @@ function day21(dataInput){
   //379A: <<vA>>^AvA^A<<vA>>^AA<<vA>A>^AAvAA<^A>A<vA>^AA<A>A<<vA>A>^AAAvA<^A>A
   console.log(`Total complexity: ${totalComplexity}`)
   resultElement.textContent =  totalComplexity;
-  troubleshoot.textContent = "Expected Result: 126384(a) 215374(b)"}
+  troubleshoot.textContent = "Expected Result: 126384(a) 215374(b)"
+}
   
 function day22(dataInput){
 
@@ -1594,13 +1610,12 @@ function day22(dataInput){
     //break //for testing purposes
   }
 
-
-
   console.log(`Expected results:\n\n1: 8685429\n10: 4700978\n100: 15273692\n2024: 8667524`)
   console.log(`Total: ${sumTotal}`)
 
   resultElement.textContent = `Result: ${sumTotal}`;
-  troubleshoot.textContent = "Expected Result: "}
+  troubleshoot.textContent = "Expected Result: "
+}
   
 function day23(dataInput){
 
@@ -1666,7 +1681,8 @@ function day23(dataInput){
   }
 
   resultElement.textContent = `Result: ${totalConnectionsWithT}`;
-  troubleshoot.textContent = "Expected Result: 7(a) 1314(b)"}
+  troubleshoot.textContent = "Expected Result: 7(a) 1314(b)"
+}
   
 function day24(dataInput){
   //Simulate the system of gates and wires. 
@@ -1717,7 +1733,8 @@ function day24(dataInput){
   console.log(zWires,zBinary,zInt)
 
   resultElement.textContent = `Result: ${zInt}`;
-  troubleshoot.textContent = "Expected Result: "}
+  troubleshoot.textContent = "Expected Result: "
+}
   
 function day25(dataInput){
 
@@ -1767,7 +1784,8 @@ function day25(dataInput){
   }
 
   resultElement.textContent = `Result: ${uniquePairs} `;
-  troubleshoot.textContent = "Expected Result:  3(a) 3360(b)"}
+  troubleshoot.textContent = "Expected Result:  3(a) 3360(b)"
+}
 
 //Sorting Algorithms
 function aStar(map, start, end) {
