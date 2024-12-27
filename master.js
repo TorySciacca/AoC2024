@@ -1666,8 +1666,54 @@ function day23(dataInput){
   troubleshoot.textContent = "Expected Result: 7(a) 1314(b)"}
   
 function day24(dataInput){
+  //Simulate the system of gates and wires. 
+  let wires = dataInput.split('\n\n')[0].split('\n')
+  wires = wires.reduce((acc, wire) => {
+    const [key, value] = wire.split(': ');
+    acc[key] = parseInt(value);
+    return acc;
+  }, {});
 
-  resultElement.textContent = "Incompleted day";
+  let zWires = {}
+
+  let instructions = dataInput.split('\n\n')[1].split('\n')
+
+  for (let i = 0; i < instructions.length; i++) {
+    const components = instructions[i].split(' '); //eg:[x00,AND,y00,->,z00]
+    const [a, opperation, b, to, c] = components
+
+    if (!(a in wires) || !(b in wires)) {
+      instructions.push(instructions.splice(i, 1)[0]);
+      i--;
+      continue;
+    } else {
+      switch (opperation) {
+        case 'AND':
+          wires[c] = wires[a] & wires[b];
+          break;
+        case 'OR':
+          wires[c] = wires[a] | wires[b];
+          break;
+        case 'XOR':
+          wires[c] = wires[a] ^ wires[b];
+          break;
+      }
+      if (c[0] == 'z') zWires[c] = wires[c]
+    }
+  }
+
+  console.log(wires,instructions)
+
+  //What decimal number does it output on the wires starting with z?
+  //construct binary Z number
+  let zBinary = ''
+  Object.keys(zWires).sort().forEach(key => {
+    zBinary = zWires[key] + zBinary
+  })
+  let zInt = parseInt(zBinary, 2)
+  console.log(zWires,zBinary,zInt)
+
+  resultElement.textContent = `Result: ${zInt}`;
   troubleshoot.textContent = "Expected Result: "}
   
 function day25(dataInput){
